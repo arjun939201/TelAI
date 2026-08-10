@@ -3,3 +3,4 @@ uvicorn[standard]
 jinja2
 requests
 python-dotenv
+openai>=1.0.0
