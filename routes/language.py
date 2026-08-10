@@ -1,18 +1,25 @@
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
 from services.language_knowledge import (
     LANGUAGE_DIR,
     get_language_files,
-    read_language_knowledge
 )
 
 
 router = APIRouter(
     prefix="/language"
 )
+
+
+ALLOWED_EXTENSIONS = {
+    ".txt",
+    ".md",
+    ".json",
+    ".csv",
+}
 
 
 @router.get("/files")
@@ -30,22 +37,26 @@ async def get_file_content(
 
     safe_name = Path(filename).name
 
-    file = LANGUAGE_DIR / safe_name
+    file_path = (
+        LANGUAGE_DIR / safe_name
+    )
 
-    if not file.exists():
+    if not file_path.exists():
+
         raise HTTPException(
             status_code=404,
             detail="File not found"
         )
 
-    if not file.is_file():
+    if not file_path.is_file():
+
         raise HTTPException(
             status_code=400,
             detail="Not a file"
         )
 
     return PlainTextResponse(
-        file.read_text(
+        file_path.read_text(
             encoding="utf-8"
         )
     )
@@ -53,23 +64,38 @@ async def get_file_content(
 
 @router.post("/upload")
 async def upload_file(
-    file: UploadFile = File(...)
+    request: Request
 ):
 
-    extension = Path(
-        file.filename
-    ).suffix.lower()
+    filename = request.headers.get(
+        "X-Filename"
+    )
 
-    if extension not in {
-        ".txt",
-        ".md",
-        ".json",
-        ".csv"
-    }:
+
+    if not filename:
 
         raise HTTPException(
             status_code=400,
-            detail="Unsupported file type"
+            detail="Filename is required"
+        )
+
+
+    filename = Path(filename).name
+
+
+    extension = Path(
+        filename
+    ).suffix.lower()
+
+
+    if extension not in ALLOWED_EXTENSIONS:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Unsupported file type. "
+                "Use .txt, .md, .json or .csv."
+            )
         )
 
 
@@ -79,9 +105,27 @@ async def upload_file(
     )
 
 
-    filename = Path(
-        file.filename
-    ).name
+    content = await request.body()
+
+
+    if not content:
+
+        raise HTTPException(
+            status_code=400,
+            detail="File is empty"
+        )
+
+
+    try:
+
+        content.decode("utf-8")
+
+    except UnicodeDecodeError:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Only UTF-8 text files are supported"
+        )
 
 
     destination = (
@@ -89,10 +133,9 @@ async def upload_file(
     )
 
 
-    content = await file.read()
-
-
-    destination.write_bytes(content)
+    destination.write_bytes(
+        content
+    )
 
 
     return {
