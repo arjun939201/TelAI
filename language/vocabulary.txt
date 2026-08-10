@@ -3,6 +3,8 @@
 # Format:
 # word = meaning
 
+టేంకణములు = నమస్కారం
+బాసట = సహాయం
 మేలిమి = best
 ముప్పు = danger / problem
 ముప్పుకాను = dangerous
