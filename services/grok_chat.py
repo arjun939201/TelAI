@@ -25,6 +25,8 @@ IMPORTANT LANGUAGE RULES:
 7. Do not include unnecessary explanations about your language rules.
 
 8. Keep responses concise and useful unless the user asks for detail.
+
+{LANGUAGE_KNOWLEDGE}
 """
 
 
