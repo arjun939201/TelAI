@@ -21,22 +21,6 @@ const mobileNewChat =
     document.getElementById("mobileNewChat");
 
 
-/* LANGUAGE FILE ELEMENTS */
-
-const languageFiles =
-    document.getElementById("languageFiles");
-
-const uploadLanguageFile =
-    document.getElementById(
-        "uploadLanguageFile"
-    );
-
-const languageFileInput =
-    document.getElementById(
-        "languageFileInput"
-    );
-
-
 /* =========================================
    CONVERSATION
 ========================================= */
@@ -53,7 +37,6 @@ function addMessage(role, content) {
     const welcome =
         document.querySelector(".welcome");
 
-
     if (welcome) {
         welcome.remove();
     }
@@ -62,14 +45,12 @@ function addMessage(role, content) {
     const message =
         document.createElement("div");
 
-
     message.className =
         `message ${role}`;
 
 
     const contentElement =
         document.createElement("div");
-
 
     contentElement.className =
         "message-content";
@@ -161,6 +142,8 @@ async function sendMessage() {
             );
 
 
+        /* Check response */
+
         if (!response.ok) {
 
             let errorMessage =
@@ -181,7 +164,7 @@ async function sendMessage() {
                 }
 
             } catch (_) {
-                // Ignore JSON parsing error
+                /* Ignore invalid JSON */
             }
 
 
@@ -190,6 +173,8 @@ async function sendMessage() {
             );
         }
 
+
+        /* Read response */
 
         const data =
             await response.json();
@@ -203,7 +188,7 @@ async function sendMessage() {
         }
 
 
-        /* Replace thinking */
+        /* Replace thinking message */
 
         thinkingMessage.textContent =
             data.reply;
@@ -232,7 +217,9 @@ async function sendMessage() {
 
 
         thinkingMessage.textContent =
-            `క్షమించండి. సమాధానం ఇవ్వడంలో సమస్య వచ్చింది.\n\n${error.message}`;
+            `క్షమించండి. సమాధానం ఇవ్వడంలో సమస్య వచ్చింది.
+
+${error.message}`;
 
 
     } finally {
@@ -253,39 +240,47 @@ async function sendMessage() {
    FORM SUBMIT
 ========================================= */
 
-form.addEventListener(
-    "submit",
-    function (event) {
+if (form) {
 
-        event.preventDefault();
-
-        sendMessage();
-
-    }
-);
-
-
-/* =========================================
-   ENTER TO SEND
-========================================= */
-
-input.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
+    form.addEventListener(
+        "submit",
+        function (event) {
 
             event.preventDefault();
 
             sendMessage();
 
         }
+    );
 
-    }
-);
+}
+
+
+/* =========================================
+   ENTER TO SEND
+========================================= */
+
+if (input) {
+
+    input.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+
+        }
+    );
+
+}
 
 
 /* =========================================
@@ -293,6 +288,11 @@ input.addEventListener(
 ========================================= */
 
 function autoResizeTextarea() {
+
+    if (!input) {
+        return;
+    }
+
 
     input.style.height =
         "auto";
@@ -306,22 +306,23 @@ function autoResizeTextarea() {
 }
 
 
-input.addEventListener(
-    "input",
-    autoResizeTextarea
-);
+if (input) {
+
+    input.addEventListener(
+        "input",
+        autoResizeTextarea
+    );
+
+}
 
 
 /* =========================================
-   NEW CHAT
+   WELCOME SCREEN
 ========================================= */
 
-function startNewChat() {
+function getWelcomeHTML() {
 
-    conversation = [];
-
-
-    chatContainer.innerHTML = `
+    return `
 
         <div class="welcome">
 
@@ -409,6 +410,20 @@ function startNewChat() {
         </div>
 
     `;
+}
+
+
+/* =========================================
+   NEW CHAT
+========================================= */
+
+function startNewChat() {
+
+    conversation = [];
+
+
+    chatContainer.innerHTML =
+        getWelcomeHTML();
 
 
     attachSuggestionEvents();
@@ -477,396 +492,10 @@ function attachSuggestionEvents() {
 }
 
 
-attachSuggestionEvents();
-
-
-/* =========================================
-   LANGUAGE FILES
-========================================= */
-
-async function loadLanguageFiles() {
-
-    if (!languageFiles) {
-        return;
-    }
-
-
-    languageFiles.innerHTML = `
-
-        <div class="language-loading">
-            దస్తాలు తెస్తోంది...
-        </div>
-
-    `;
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/api/language/files"
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                `HTTP ${response.status}`
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        languageFiles.innerHTML = "";
-
-
-        if (
-            !data.files ||
-            data.files.length === 0
-        ) {
-
-            languageFiles.innerHTML = `
-
-                <div class="language-empty">
-                    దస్తాలు లేవు
-                </div>
-
-            `;
-
-            return;
-        }
-
-
-        data.files.forEach(
-            filename => {
-
-                const row =
-                    document.createElement(
-                        "button"
-                    );
-
-
-                row.type = "button";
-
-
-                row.className =
-                    "language-file";
-
-
-                row.innerHTML = `
-
-                    <span class="file-icon">
-                        📄
-                    </span>
-
-                    <span class="file-name">
-                        ${escapeHtml(filename)}
-                    </span>
-
-                `;
-
-
-                row.addEventListener(
-                    "click",
-                    () =>
-                        openLanguageFile(
-                            filename
-                        )
-                );
-
-
-                languageFiles.appendChild(
-                    row
-                );
-
-            }
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Language files error:",
-            error
-        );
-
-
-        languageFiles.innerHTML = `
-
-            <div class="language-error">
-                దస్తాలు తెచ్చుటలో సమస్య
-            </div>
-
-        `;
-
-    }
-}
-
-
-/* =========================================
-   OPEN LANGUAGE FILE
-========================================= */
-
-async function openLanguageFile(
-    filename
-) {
-
-    try {
-
-        const response =
-            await fetch(
-                `/api/language/content/${encodeURIComponent(filename)}`
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                `HTTP ${response.status}`
-            );
-
-        }
-
-
-        const content =
-            await response.text();
-
-
-        addMessage(
-            "assistant",
-            `📄 ${filename}\n\n${content}`
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "File open error:",
-            error
-        );
-
-
-        addMessage(
-            "assistant",
-            `దస్తాను తెరవలేకపోయాను: ${error.message}`
-        );
-
-    }
-}
-
-
-/* =========================================
-   UPLOAD LANGUAGE FILE
-   No FormData / no multipart
-========================================= */
-
-if (uploadLanguageFile) {
-
-    uploadLanguageFile.addEventListener(
-        "click",
-        function () {
-
-            if (languageFileInput) {
-
-                languageFileInput.click();
-
-            }
-
-        }
-    );
-
-}
-
-
-if (languageFileInput) {
-
-    languageFileInput.addEventListener(
-        "change",
-        uploadLanguageFileToServer
-    );
-
-}
-
-
-async function uploadLanguageFileToServer() {
-
-    const file =
-        languageFileInput.files[0];
-
-
-    if (!file) {
-        return;
-    }
-
-
-    /* Allowed extensions */
-
-    const allowedTypes = [
-        ".txt",
-        ".md",
-        ".json",
-        ".csv"
-    ];
-
-
-    const filename =
-        file.name.toLowerCase();
-
-
-    const valid =
-        allowedTypes.some(
-            extension =>
-                filename.endsWith(extension)
-        );
-
-
-    if (!valid) {
-
-        addMessage(
-            "assistant",
-            "ఈ దస్తా రకం అనుమతించబడలేదు. .txt, .md, .json లేదా .csv దస్తాను ఎక్కించు."
-        );
-
-
-        languageFileInput.value = "";
-
-        return;
-    }
-
-
-    if (uploadLanguageFile) {
-
-        uploadLanguageFile.disabled =
-            true;
-
-        uploadLanguageFile.textContent =
-            "ఎక్కిస్తోంది...";
-
-    }
-
-
-    try {
-
-        /*
-         * Send the file itself as the request body.
-         *
-         * The filename is sent through X-Filename.
-         *
-         * This avoids multipart/form-data,
-         * so python-multipart is NOT required.
-         */
-
-        const response =
-            await fetch(
-                "/api/language/upload",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "X-Filename":
-                            file.name
-                    },
-
-                    body: file
-                }
-            );
-
-
-        let data = {};
-
-
-        try {
-
-            data =
-                await response.json();
-
-        } catch (_) {
-
-            // Server may return non-JSON error
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.detail ||
-                `HTTP ${response.status}`
-            );
-
-        }
-
-
-        await loadLanguageFiles();
-
-
-        addMessage(
-            "assistant",
-            `✓ ${file.name} భాషా దస్తాలలోకి ఎక్కించబడింది.`
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Upload error:",
-            error
-        );
-
-
-        addMessage(
-            "assistant",
-            `దస్తాను ఎక్కించలేకపోయాను: ${error.message}`
-        );
-
-
-    } finally {
-
-        if (uploadLanguageFile) {
-
-            uploadLanguageFile.disabled =
-                false;
-
-            uploadLanguageFile.textContent =
-                "＋ దస్తా ఎక్కించు";
-
-        }
-
-
-        languageFileInput.value = "";
-
-    }
-}
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHtml(value) {
-
-    const div =
-        document.createElement("div");
-
-
-    div.textContent =
-        value;
-
-
-    return div.innerHTML;
-}
-
-
 /* =========================================
    INITIALIZE
 ========================================= */
 
-loadLanguageFiles();
-
-input.focus();
+attachSuggestionEvents();
 
 autoResizeTextarea();
