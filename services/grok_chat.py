@@ -1,7 +1,6 @@
 import requests
 
 from config import GROQ_TOKEN, GROQ_URL, GROQ_MODEL
-from services.language_knowledge import read_language_knowledge
 
 
 SYSTEM_PROMPT = """
@@ -56,9 +55,6 @@ IMPORTANT RULES:
 12. The user is developing the Melimi Telugu language. Treat the
     supplied language files as the project's current working corpus.
 
-CURRENT MELIMI TELUGU LANGUAGE KNOWLEDGE:
-
-{LANGUAGE_KNOWLEDGE}
 """
 
 
