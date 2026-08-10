@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="te">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,80 +10,155 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>TelAI</title>
+    <title>TelAI — మేలిమి తెలుగు</title>
 
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link
+        rel="stylesheet"
+        href="/static/css/styles.css"
+    >
+
 </head>
 
 <body>
 
 <div class="app">
 
+    <!-- ========================= -->
     <!-- SIDEBAR -->
+    <!-- ========================= -->
+
     <aside class="sidebar">
 
         <div class="brand">
-            <div class="brand-icon">T</div>
+
+            <div class="brand-icon">
+                T
+            </div>
 
             <div>
-                <div class="brand-name">TelAI</div>
-                <div class="brand-subtitle">AI Assistant</div>
+
+                <div class="brand-name">
+                    TelAI
+                </div>
+
+                <div class="brand-subtitle">
+                    మేలిమి తెలుగు AI
+                </div>
+
             </div>
+
         </div>
 
-<div class="language-explorer">
 
-    <div class="section-title">
-        LANGUAGE
-    </div>
+        <!-- NEW CHAT -->
 
-    <div class="folder-row">
-        <span>📁</span>
-        <strong>language</strong>
-    </div>
-
-    <div id="languageFiles"></div>
-
-    <button
-        id="uploadLanguageFile"
-        class="upload-button"
-    >
-        ＋ Upload file
-    </button>
-
-</div>
         <button
             id="clearButton"
             class="new-chat-button"
+            type="button"
         >
+
             <span>＋</span>
-            New chat
+
+            కొత్త మాట
+
         </button>
 
+
+        <!-- LANGUAGE FILE EXPLORER -->
+
+        <div class="language-explorer">
+
+            <div class="section-title">
+                భాషా దస్తాలు
+            </div>
+
+
+            <div class="folder-row">
+
+                <span>📁</span>
+
+                <strong>
+                    language
+                </strong>
+
+            </div>
+
+
+            <div
+                id="languageFiles"
+                class="language-files"
+            >
+
+                <div class="language-loading">
+                    దస్తాలు తెస్తోంది...
+                </div>
+
+            </div>
+
+
+            <button
+                id="uploadLanguageFile"
+                class="upload-button"
+                type="button"
+            >
+
+                ＋ దస్తా ఎక్కించు
+
+            </button>
+
+
+            <input
+                type="file"
+                id="languageFileInput"
+                accept=".txt,.md,.json,.csv"
+                hidden
+            >
+
+        </div>
+
+
+        <!-- CHAT HISTORY -->
 
         <div class="sidebar-section">
 
             <div class="section-title">
-                TODAY
+                ఈరోజు
             </div>
 
+
             <div class="chat-item active">
-                <span class="chat-icon">◌</span>
-                <span>New conversation</span>
+
+                <span class="chat-icon">
+                    ◌
+                </span>
+
+                <span>
+                    కొత్త సంభాషణ
+                </span>
+
             </div>
 
         </div>
 
 
+        <!-- SIDEBAR BOTTOM -->
+
         <div class="sidebar-bottom">
 
             <div class="status">
+
                 <span class="status-dot"></span>
-                <span>AI Online</span>
+
+                <span>
+                    AI పనిచేస్తోంది
+                </span>
+
             </div>
 
+
             <div class="powered">
-                Powered by Groq
+                Groq ఆధారితం
             </div>
 
         </div>
@@ -90,87 +166,144 @@
     </aside>
 
 
+    <!-- ========================= -->
     <!-- MAIN -->
+    <!-- ========================= -->
+
     <main class="main">
 
+
         <!-- TOP BAR -->
+
         <header class="topbar">
 
             <div class="mobile-brand">
-                <div class="brand-icon small">T</div>
-                <span>TelAI</span>
+
+                <div class="brand-icon small">
+                    T
+                </div>
+
+                <span>
+                    TelAI
+                </span>
+
             </div>
 
+
             <div class="model-info">
-                <span class="model-name">TelAI</span>
-                <span class="model-badge">AI</span>
+
+                <span class="model-name">
+                    మేలిమి తెలుగు AI
+                </span>
+
+                <span class="model-badge">
+                    AI
+                </span>
+
             </div>
+
 
             <button
                 id="mobileNewChat"
                 class="mobile-new-chat"
+                type="button"
+                aria-label="కొత్త మాట"
             >
+
                 ＋
+
             </button>
 
         </header>
 
 
+        <!-- ========================= -->
         <!-- CHAT -->
+        <!-- ========================= -->
+
         <section
             id="chatContainer"
             class="chat-container"
         >
 
-            <!-- WELCOME -->
             <div class="welcome">
 
                 <div class="welcome-icon">
                     T
                 </div>
 
+
                 <h1>
-                    How can I help you?
+                    ఏమి తెలుసుకొనగోరుతున్నావు?
                 </h1>
 
+
                 <p>
-                    Ask questions, write code, learn something new,
-                    or just have a conversation.
+                    మేలిమి తెలుగు పదాలు, పదనిర్మాణం,
+                    వ్యాకరణం లేదా ఏదైనా విషయాన్ని అడుగు.
                 </p>
 
 
                 <div class="suggestions">
 
-                    <button
-                        class="suggestion"
-                        data-message="Explain Python in simple words"
-                    >
-                        <span>⌘</span>
-                        Explain Python simply
-                    </button>
 
                     <button
                         class="suggestion"
-                        data-message="Help me learn programming"
+                        data-message="మేలిమి తెలుగు అంటే ఏమిటి?"
+                        type="button"
                     >
-                        <span>◇</span>
-                        Help me learn programming
+
+                        <span>
+                            ◈
+                        </span>
+
+                        మేలిమి తెలుగు అంటే ఏమిటి?
+
                     </button>
+
 
                     <button
                         class="suggestion"
-                        data-message="Write a professional resume summary"
+                        data-message="హత్తరం అనే పదానికి అర్థం ఏమిటి?"
+                        type="button"
                     >
-                        <span>✦</span>
-                        Write something for me
+
+                        <span>
+                            ◇
+                        </span>
+
+                        పదం అర్థం అడుగు
+
                     </button>
+
 
                     <button
                         class="suggestion"
-                        data-message="Tell me something interesting"
+                        data-message="ఒక కొత్త మేలిమి తెలుగు పదాన్ని సూచించు."
+                        type="button"
                     >
-                        <span>◈</span>
-                        Something interesting
+
+                        <span>
+                            ✦
+                        </span>
+
+                        కొత్త పదం సూచించు
+
+                    </button>
+
+
+                    <button
+                        class="suggestion"
+                        data-message="మేలిమి తెలుగు పదనిర్మాణ నియమాలను వివరించు."
+                        type="button"
+                    >
+
+                        <span>
+                            ⌘
+                        </span>
+
+                        పదనిర్మాణం నేర్చుకో
+
                     </button>
 
                 </div>
@@ -180,7 +313,10 @@
         </section>
 
 
+        <!-- ========================= -->
         <!-- COMPOSER -->
+        <!-- ========================= -->
+
         <div class="composer-area">
 
             <form
@@ -190,7 +326,7 @@
 
                 <textarea
                     id="messageInput"
-                    placeholder="Message TelAI..."
+                    placeholder="మేలిమి తెలుగులో అడుగు..."
                     rows="1"
                     autocomplete="off"
                 ></textarea>
@@ -199,14 +335,16 @@
                 <button
                     type="submit"
                     id="sendButton"
-                    aria-label="Send message"
+                    aria-label="పంపు"
                 >
+
                     <svg
                         width="18"
                         height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                     >
+
                         <path
                             d="M5 12H19M19 12L13 6M19 12L13 18"
                             stroke="currentColor"
@@ -214,7 +352,9 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         />
+
                     </svg>
+
                 </button>
 
             </form>
@@ -222,9 +362,8 @@
 
             <div class="composer-footer">
 
-                <span>
-                    TelAI may make mistakes. Verify important information.
-                </span>
+                TelAI తప్పులు చేయవచ్చు.
+                ముఖ్యమైన సమాచారాన్ని నిర్ధారించుకో.
 
             </div>
 
@@ -233,12 +372,7 @@
     </main>
 
 </div>
-<input
-    type="file"
-    id="languageFileInput"
-    accept=".txt,.md,.json,.csv"
-    hidden
->
+
 
 <script src="/static/js/chatbot.js"></script>
 
