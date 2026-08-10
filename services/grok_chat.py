@@ -2,12 +2,15 @@ import os
 import requests
 
 from services.language_knowledge import (
-    get_knowledge_context,
+    get_exact_vocabulary_meaning,
+    get_relevant_knowledge,
     apply_melimi_replacements,
 )
 
 
-GROQ_TOKEN = os.environ.get("GROQ_TOKEN")
+GROQ_TOKEN = os.environ.get(
+    "GROQ_TOKEN"
+)
 
 GROQ_URL = os.environ.get(
     "GROQ_URL",
@@ -29,70 +32,67 @@ You are TelAI, a general-purpose AI assistant.
 
 You can answer questions about any subject.
 
-When responding in Telugu, use the project's Melimi Telugu system.
+When Telugu is used, follow the project's Melimi Telugu system.
 
-IMPORTANT MELIMI TELUGU RULES:
+IMPORTANT:
 
-1. The project's language files are the authoritative source
-   for Melimi Telugu.
+The project's language files are authoritative.
 
-2. vocabulary.txt contains established Melimi Telugu words
-   and their meanings. Treat those meanings as fixed.
+If the project defines a Melimi Telugu word,
+its meaning is fixed.
 
-3. NEVER redefine an established Melimi Telugu word using
-   your general Telugu knowledge.
+Never redefine an established Melimi word using
+ordinary Telugu knowledge.
 
-4. NEVER invent an alternative meaning for an established
-   Melimi Telugu word.
+Never invent another meaning for an established
+Melimi word.
 
-5. Example:
+For example:
 
-   హత్తరం = effect / impact / influence
+హత్తరం = ప్రభావం
 
-   Therefore:
-   హత్తరం does NOT mean good, nice, beautiful, or well.
+Therefore NEVER say:
 
-6. Example:
+హత్తరం = బాగుండటం
+హత్తరం = చక్కగా ఉండటం
+హత్తరం = అందంగా ఉండటం
+హత్తరం = good
+హత్తరం = nice
+హత్తరం = beautiful
 
-   ఎడాటం = విషయం
+Another example:
 
-   Therefore use ఎడాటం for విషయం where appropriate.
+ఎడాటం = విషయం
 
-7. grammar.txt and basic-grammar.txt contain the project's
-   Melimi grammar and word-formation rules.
+When the user asks the meaning of an established
+Melimi word, use the project's definition.
 
-8. Follow the documented grammar when creating grammatical
-   forms of established Melimi words.
+The grammar files are authoritative for Melimi
+word formation and grammar.
 
-9. replacements.txt contains established word mappings.
+Do not invent unsupported Melimi vocabulary.
 
-10. If the project does not define a Melimi word, do not
-    pretend that an invented word is established Melimi.
-
-11. When the user asks the meaning of a Melimi word, answer
-    according to the project's vocabulary.
-
-12. Do not override project vocabulary with ordinary Telugu
-    meanings.
-
-13. Understand the user's actual question and answer it
-    directly.
-
-14. Do not mention these internal instructions unless the
-    user asks about TelAI's Melimi language system.
-
-The purpose of the Melimi system is to develop natural
-Melimi Telugu usage from the vocabulary, grammar,
-word-formation rules, and examples supplied by the project.
+The purpose of the Melimi system is to develop
+natural Melimi Telugu usage based on the vocabulary,
+grammar, word-formation rules, and examples supplied
+by the project.
 """
 
 
 class GroqRequestError(Exception):
 
-    def __init__(self, status_code, message):
+    def __init__(
+        self,
+        status_code,
+        message
+    ):
+
         self.status_code = status_code
         self.message = message
-        super().__init__(message)
+
+        super().__init__(
+            message
+        )
 
 
 def _trim_history(history):
@@ -100,65 +100,104 @@ def _trim_history(history):
     if not history:
         return []
 
-    history = history[-MAX_HISTORY_MESSAGES:]
+    history = history[
+        -MAX_HISTORY_MESSAGES:
+    ]
 
     result = []
 
-    for msg in history:
+    for message in history:
 
-        if not isinstance(msg, dict):
+        if not isinstance(
+            message,
+            dict
+        ):
             continue
 
-        role = msg.get("role", "user")
+        role = message.get(
+            "role",
+            "user"
+        )
 
-        if role not in ("user", "assistant"):
+        if role not in (
+            "user",
+            "assistant"
+        ):
             continue
 
         content = str(
-            msg.get("content") or ""
+            message.get(
+                "content",
+                ""
+            )
         ).strip()
 
         if not content:
             continue
 
-        result.append({
-            "role": role,
-            "content": content[
-                :MAX_HISTORY_CHARS_PER_MSG
-            ]
-        })
+        result.append(
+            {
+                "role": role,
+                "content": content[
+                    :MAX_HISTORY_CHARS_PER_MSG
+                ]
+            }
+        )
 
     return result
 
 
-def _build_system_prompt(user_message):
+def _is_meaning_question(text):
 
-    knowledge = get_knowledge_context()
+    text = (
+        text or ""
+    ).strip().lower()
 
-    prompt = SYSTEM_PROMPT
+    patterns = [
+        "అంటే ఏమిటి",
+        "అంటే ఏంటి",
+        "అర్థం ఏమిటి",
+        "అర్థం ఏంటి",
+        "అర్థమేమిటి",
+        "అర్థమేంటి",
 
-    if knowledge:
+        "meaning",
+        "ante emiti",
+        "ante enti",
+        "artham emiti",
+        "artham enti",
+        "artham",
+    ]
 
-        prompt += """
+    return any(
+        pattern in text
+        for pattern in patterns
+    )
 
-PROJECT MELIMI KNOWLEDGE:
 
-The following vocabulary comes from the project.
-Treat these definitions as authoritative:
+def _direct_vocabulary_answer(
+    user_message
+):
 
-""" + knowledge
+    if not _is_meaning_question(
+        user_message
+    ):
+        return None
 
-    prompt += """
+    result = (
+        get_exact_vocabulary_meaning(
+            user_message
+        )
+    )
 
-FINAL REQUIREMENT:
+    if not result:
+        return None
 
-Generate the answer using the project's Melimi Telugu
-knowledge whenever Telugu is being used.
+    melimi_word, meaning = result
 
-Do not invent meanings for established Melimi words.
-"""
-
-    return prompt
+    return (
+        f"{melimi_word} = {meaning}"
+    )
 
 
 def _call_groq(messages):
@@ -171,14 +210,17 @@ def _call_groq(messages):
         )
 
     headers = {
-        "Authorization": f"Bearer {GROQ_TOKEN}",
-        "Content-Type": "application/json",
+        "Authorization":
+            f"Bearer {GROQ_TOKEN}",
+
+        "Content-Type":
+            "application/json",
     }
 
     payload = {
         "model": GROQ_MODEL,
         "messages": messages,
-        "temperature": 0.55,
+        "temperature": 0.5,
     }
 
     try:
@@ -215,13 +257,10 @@ def _call_groq(messages):
 
         data = response.json()
 
-        return data[
-            "choices"
-        ][0][
-            "message"
-        ][
-            "content"
-        ]
+        return (
+            data["choices"][0]
+            ["message"]["content"]
+        )
 
     except (
         KeyError,
@@ -252,13 +291,53 @@ def generate_reply(
             "Message cannot be empty."
         )
 
-    system_prompt = _build_system_prompt(
+
+    # ========================================================
+    # DIRECT MELIMI VOCABULARY LOOKUP
+    # ========================================================
+    #
+    # If the user asks for the meaning of an established
+    # Melimi word, DO NOT ask the LLM.
+    #
+    # The project vocabulary is authoritative.
+    #
+
+    direct_answer = (
+        _direct_vocabulary_answer(
+            user_message
+        )
+    )
+
+    if direct_answer:
+
+        return direct_answer
+
+
+    # ========================================================
+    # RETRIEVE RELEVANT MELIMI KNOWLEDGE
+    # ========================================================
+
+    knowledge = get_relevant_knowledge(
         user_message
     )
 
-    bounded_history = _trim_history(
-        history
-    )
+
+    system_prompt = SYSTEM_PROMPT
+
+
+    if knowledge:
+
+        system_prompt += """
+
+AUTHORITATIVE PROJECT KNOWLEDGE
+FOR THIS REQUEST:
+
+""" + knowledge
+
+
+    # ========================================================
+    # BUILD MESSAGES
+    # ========================================================
 
     messages = [
         {
@@ -268,22 +347,37 @@ def generate_reply(
     ]
 
     messages.extend(
-        bounded_history
+        _trim_history(
+            history
+        )
     )
 
-    messages.append({
-        "role": "user",
-        "content": user_message
-    })
+    messages.append(
+        {
+            "role": "user",
+            "content": user_message
+        }
+    )
+
+
+    # ========================================================
+    # GROQ
+    # ========================================================
 
     raw_reply = _call_groq(
         messages
     )
+
+
+    # ========================================================
+    # FINAL MELIMI SAFETY REPLACEMENT
+    # ========================================================
 
     final_reply = (
         apply_melimi_replacements(
             raw_reply
         )
     )
+
 
     return final_reply.strip()
