@@ -1,0 +1,6 @@
+# Melimi Telugu Notes
+
+This directory contains the working Melimi Telugu language knowledge.
+
+Vocabulary, grammar, word formation rules, examples and other
+language-development notes can be stored here.
