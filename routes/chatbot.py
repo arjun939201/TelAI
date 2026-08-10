@@ -1,28 +1,7 @@
-"""
-routes/chatbot.py
-
-/api/chat endpoint.
-
-Frontend contract:
-
-POST /api/chat
-
-Request:
-{
-    "message": "...",
-    "history": [...]
-}
-
-Response:
-{
-    "reply": "..."
-}
-"""
-
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from services.grok_chat import (
     generate_reply,
@@ -33,104 +12,87 @@ from services.grok_chat import (
 router = APIRouter()
 
 
-# ============================================================
-# CHAT MESSAGE
-# ============================================================
-
 class ChatMessage(BaseModel):
 
     role: str
+
     content: str
 
 
-# ============================================================
-# CHAT REQUEST
-# ============================================================
-
 class ChatRequest(BaseModel):
 
-    message: str
-    history: Optional[List[ChatMessage]] = None
+    message: str = Field(
+        ...,
+        min_length=1,
+        max_length=4000,
+    )
 
+    history: Optional[
+        List[ChatMessage]
+    ] = None
 
-# ============================================================
-# CHAT RESPONSE
-# ============================================================
 
 class ChatResponse(BaseModel):
 
     reply: str
 
 
-# ============================================================
-# CHAT ENDPOINT
-# ============================================================
-
 @router.post(
     "/chat",
-    response_model=ChatResponse
+    response_model=ChatResponse,
 )
 async def chat(
-    request: ChatRequest
+    request: ChatRequest,
 ):
 
     message = request.message.strip()
 
     if not message:
-
         raise HTTPException(
             status_code=400,
-            detail="message cannot be empty."
+            detail="message cannot be empty.",
         )
 
-
-    history_dicts = []
+    history = []
 
     if request.history:
 
-        for msg in request.history:
+        for item in request.history:
 
-            history_dicts.append(
+            if item.role not in (
+                "user",
+                "assistant",
+            ):
+                continue
+
+            history.append(
                 {
-                    "role": msg.role,
-                    "content": msg.content
+                    "role": item.role,
+                    "content": item.content,
                 }
             )
-
 
     try:
 
         reply = generate_reply(
             message,
-            history_dicts
+            history,
         )
 
     except GroqRequestError as exc:
 
-        print(
-            "GROQ ERROR:",
-            exc.status_code,
-            exc.message
-        )
-
         raise HTTPException(
             status_code=exc.status_code,
-            detail=exc.message
+            detail=exc.message,
         )
 
-    except Exception as exc:
-
-        print(
-            "CHAT ERROR:",
-            repr(exc)
-        )
+    except Exception:
 
         raise HTTPException(
             status_code=500,
-            detail="Chat service failed."
+            detail="Chat service failed.",
         )
 
-
     return ChatResponse(
-        reply=reply
+        reply=reply,
     )
