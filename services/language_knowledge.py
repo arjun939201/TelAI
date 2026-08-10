@@ -6,6 +6,22 @@ import threading
 BASE_DIR = Path(__file__).resolve().parent.parent
 LANGUAGE_DIR = BASE_DIR / "language"
 
+def get_language_files():
+    """Return available Melimi language files."""
+
+    if not LANGUAGE_DIR.exists():
+        return []
+
+    files = []
+
+    for path in sorted(LANGUAGE_DIR.glob("*.txt")):
+
+        files.append({
+            "name": path.name,
+            "path": path.name
+        })
+
+    return files
 MAX_KNOWLEDGE_CONTEXT_CHARS = 7000
 MAX_RELEVANT_ENTRIES = 40
 
