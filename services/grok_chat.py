@@ -1,42 +1,249 @@
+import re
 import requests
 
 from config import GROQ_TOKEN, GROQ_URL, GROQ_MODEL
+from services.language_knowledge import read_language_knowledge
 
+
+# ============================================================
+# TELAI SYSTEM PROMPT
+# ============================================================
 
 SYSTEM_PROMPT = """
-You are TelAI, a general-purpose Telugu AI chatbot.
+You are TelAI, a Telugu AI chatbot.
 
-IMPORTANT LANGUAGE RULES:
+Answer the user's question naturally and accurately in Telugu.
 
-1. Respond primarily in Telugu when the user communicates in Telugu.
+IMPORTANT:
 
-2. Answer the user's actual question directly.
+1. Answer the user's actual question.
+2. Use Telugu for normal conversation.
+3. Do not unnecessarily discuss language development.
+4. Do not invent Melimi Telugu vocabulary.
+5. Do not attempt to perform vocabulary replacement yourself.
+6. A separate TelAI language-processing layer will convert
+   established Telugu vocabulary into the project's Melimi Telugu
+   vocabulary after your response is generated.
 
-3. Do not behave as a dedicated Melimi Telugu language-development
-   assistant unless the user specifically asks about Melimi Telugu.
+Your job is ONLY to generate the best natural Telugu response.
 
-4. Do not invent vocabulary, grammar, facts, or terminology.
-
-5. Use natural, clear Telugu.
-
-6. Keep technical terms in their necessary form when there is no
-   established Telugu equivalent.
-
-7. Do not include unnecessary explanations about your language rules.
-
-8. Keep responses concise and useful unless the user asks for detail.
-
-{LANGUAGE_KNOWLEDGE}
+The final response will be processed automatically by TelAI.
 """
 
 
-def chat_with_grok(message: str, history=None):
+# ============================================================
+# READ MELIMI VOCABULARY MAPPINGS
+# ============================================================
 
-    if not GROQ_TOKEN:
-        raise RuntimeError(
-            "GROQ_TOKEN is not configured"
+def get_replacement_mappings():
+    """
+    Read the language files and extract mappings such as:
+
+        బాసట = సహాయం
+        హత్తరం = ప్రభావం
+        ముప్పు = ప్రమాదం
+
+    Meaning:
+
+        ordinary Telugu -> Melimi Telugu
+
+    Example:
+
+        సహాయం -> బాసట
+    """
+
+    try:
+
+        language_text = read_language_knowledge()
+
+    except Exception as error:
+
+        print(
+            "LANGUAGE KNOWLEDGE ERROR:",
+            str(error)
         )
 
+        return []
+
+
+    mappings = []
+
+
+    # --------------------------------------------------------
+    # Read line by line
+    # --------------------------------------------------------
+
+    for line in language_text.splitlines():
+
+        line = line.strip()
+
+
+        if not line:
+            continue
+
+
+        # Ignore comments/headings
+
+        if line.startswith("#"):
+            continue
+
+
+        # ----------------------------------------------------
+        # Expected format:
+        #
+        # మేలిమి పదం = సాధారణ పదం
+        #
+        # Example:
+        #
+        # బాసట = సహాయం
+        # ----------------------------------------------------
+
+        if "=" not in line:
+            continue
+
+
+        left, right = line.split(
+            "=",
+            1
+        )
+
+
+        melimi_word = left.strip()
+
+        standard_word = right.strip()
+
+
+        if not melimi_word:
+            continue
+
+
+        if not standard_word:
+            continue
+
+
+        # Remove optional explanation after /
+        #
+        # Example:
+        #
+        # బాసట = సహాయం / help
+        #
+        # We only want:
+        #
+        # సహాయం
+        #
+
+        standard_word = (
+            standard_word
+            .split("/", 1)[0]
+            .strip()
+        )
+
+
+        # Avoid extremely long entries
+
+        if (
+            len(melimi_word) > 100
+            or len(standard_word) > 100
+        ):
+            continue
+
+
+        mappings.append(
+            (
+                standard_word,
+                melimi_word
+            )
+        )
+
+
+    return mappings
+
+
+# ============================================================
+# REPLACE WORDS
+# ============================================================
+
+def replace_melimi_words(text):
+    """
+    Replace established ordinary Telugu vocabulary with
+    Melimi Telugu vocabulary.
+
+    Example:
+
+        నాకు సహాయం కావాలి.
+
+    becomes:
+
+        నాకు బాసట కావాలి.
+    """
+
+    if not text:
+        return text
+
+
+    mappings = get_replacement_mappings()
+
+
+    if not mappings:
+        return text
+
+
+    # --------------------------------------------------------
+    # Longest words first.
+    #
+    # This prevents a short mapping from replacing part of
+    # a longer mapping.
+    # --------------------------------------------------------
+
+    mappings.sort(
+        key=lambda item: len(item[0]),
+        reverse=True
+    )
+
+
+    result = text
+
+
+    for standard_word, melimi_word in mappings:
+
+        # Escape the vocabulary for regex
+
+        escaped =
+            re.escape(standard_word)
+
+
+        # ----------------------------------------------------
+        # Telugu does not have the same whitespace rules as
+        # English, so use a conservative boundary approach.
+        #
+        # Do not replace if the word is embedded inside
+        # another Telugu word.
+        # ----------------------------------------------------
+
+        pattern = re.compile(
+            rf"(?<![\u0C00-\u0C7F])"
+            rf"{escaped}"
+            rf"(?![\u0C00-\u0C7F])"
+        )
+
+
+        result = pattern.sub(
+            melimi_word,
+            result
+        )
+
+
+    return result
+
+
+# ============================================================
+# GENERATE TELUGU RESPONSE
+# ============================================================
+
+def generate_response(
+    message: str,
+    history=None
+):
 
     messages = [
         {
@@ -46,9 +253,10 @@ def chat_with_grok(message: str, history=None):
     ]
 
 
-    # Add previous conversation history.
-    # Keep only the most recent messages so the request
-    # does not grow unnecessarily large.
+    # --------------------------------------------------------
+    # Add recent conversation
+    # --------------------------------------------------------
+
     if history:
 
         for item in history[-10:]:
@@ -58,7 +266,10 @@ def chat_with_grok(message: str, history=None):
 
 
             if (
-                role in ("user", "assistant")
+                role in (
+                    "user",
+                    "assistant"
+                )
                 and content
             ):
 
@@ -70,7 +281,10 @@ def chat_with_grok(message: str, history=None):
                 )
 
 
-    # Add current user message.
+    # --------------------------------------------------------
+    # Current user message
+    # --------------------------------------------------------
+
     messages.append(
         {
             "role": "user",
@@ -82,14 +296,17 @@ def chat_with_grok(message: str, history=None):
     payload = {
         "model": GROQ_MODEL,
         "messages": messages,
-        "temperature": 0.7,
-        "max_tokens": 2000
+        "temperature": 0.4,
+        "max_tokens": 1500
     }
 
 
     headers = {
-        "Authorization": f"Bearer {GROQ_TOKEN}",
-        "Content-Type": "application/json"
+        "Authorization":
+            f"Bearer {GROQ_TOKEN}",
+
+        "Content-Type":
+            "application/json"
     }
 
 
@@ -115,6 +332,10 @@ def chat_with_grok(message: str, history=None):
         )
 
 
+    # --------------------------------------------------------
+    # API error
+    # --------------------------------------------------------
+
     if not response.ok:
 
         print(
@@ -134,12 +355,19 @@ def chat_with_grok(message: str, history=None):
         )
 
 
+    # --------------------------------------------------------
+    # Read Groq response
+    # --------------------------------------------------------
+
     try:
 
         data = response.json()
 
+
         reply = (
-            data["choices"][0]["message"]["content"]
+            data["choices"][0]
+            ["message"]
+            ["content"]
         )
 
 
@@ -161,3 +389,63 @@ def chat_with_grok(message: str, history=None):
 
 
     return reply
+
+
+# ============================================================
+# MAIN TELAI CHAT FUNCTION
+# ============================================================
+
+def chat_with_grok(
+    message: str,
+    history=None
+):
+
+    if not GROQ_TOKEN:
+
+        raise RuntimeError(
+            "GROQ_TOKEN is not configured"
+        )
+
+
+    # --------------------------------------------------------
+    # STEP 1
+    #
+    # AI generates a normal Telugu response.
+    # --------------------------------------------------------
+
+    generated_reply = generate_response(
+        message,
+        history
+    )
+
+
+    print(
+        "GROQ ORIGINAL:",
+        generated_reply
+    )
+
+
+    # --------------------------------------------------------
+    # STEP 2
+    #
+    # Match generated words against the language files.
+    # --------------------------------------------------------
+
+    final_reply = replace_melimi_words(
+        generated_reply
+    )
+
+
+    # --------------------------------------------------------
+    # STEP 3
+    #
+    # Return the processed response.
+    # --------------------------------------------------------
+
+    print(
+        "TELAI FINAL:",
+        final_reply
+    )
+
+
+    return final_reply
