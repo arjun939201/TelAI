@@ -39,6 +39,11 @@ app.include_router(
     tags=["Chat"]
 )
 
+app.include_router(
+    language_router,
+    prefix="/api",
+    tags=["Language"]
+)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
