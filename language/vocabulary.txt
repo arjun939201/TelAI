@@ -1,99 +1,1512 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
-from fastapi.responses import PlainTextResponse
+# Melimi Telugu Vocabulary
 
-from services.language_knowledge import (
-    LANGUAGE_DIR,
-    get_language_files,
-    read_language_knowledge
-)
+# Format:
+# word = meaning
+
+మేలిమి = best
+ముప్పు = danger / problem
+ముప్పుకాను = dangerous
+ముప్పుగారం = dangerousness
+హత్తరం = effect / impact / influence
+హత్తరకాను = effective
+హత్తరమారి = influential
+చిక్కు = problem
+చిక్కీవు = problematic
+కలిమి = wealth / possession
+అకలిమి = lack / absence
+కంటు = hatred
+అకంటు = non-hatred
+కంటుపాదు = hateful
+అకంటుపాదు = non-hateful
+అమరం = system
+మెదలం = concept / thought
+నిరుసటి = systematic / orderly
+బిసెర్మి = technology
+తైలం = relation / connection
+తౌలమైన = related
+చేబైలు = field
+కుదురుకొను = stabilize / settle
+విరివి = extensive / broad
+ఐనిండు = complete
+పోతరం = strength
+బలిమి = strength
+ఎల్తరం = comprehensive
+తేట = clear / clarity
+తనకం = natural
+వంచంగా = especially / mainly
+కారు = time / period
+తరి = time / period
+వాను = having / possessing
+కాను = doer / agent
+పాటకాను = singer
+పెంపుకాను = developer
+పాటుకాను = hardworking
+నెనరువాను = grateful
+ప్రాయివాను = fortunate
+మైవాను = physical
+గెలువాను = winner
+మిన్వాఁక = galaxy
+మిణుగుత్తి = star cluster
+సిరిక = meteor
+తోకజుక్క = comet
+విన్నరవ = asteroid
+పాలపుంత = Milky Way
+పాలవెల్లి = Milky Way
+నెసరమరం = solar system
+నెసరు = Sun
+జాబిలి = Moon
+నెలాత = Mercury
+వేగుపలి = Venus
+కెంబలి = Mars
+నేలతల్లి = Earth
+పారిగుండ్రం = Earth
+కాంచువు = Jupiter
+గాడ్పలి = Saturn
+మాతి = Rahu
+సీదరం = Ketu
+రెంచ = human / person
+తాఁజూచు = perceive
+తాఁజూడలవి = perceivable
+మెఱుం = electricity
+సూదంటు = magnet
+చెదిరిక = radiation
+మెఱుం-సూదంటు చెదిరిక = electromagnetic radiation
+ఎలారము = universe
+విన్నరము = planet
+వెలుఁగు = light
+వెలుగు-వనరు = light source
+వంచ వెలుగు వనరు = primary light source
+తరుకారు = later period / subsequent time
+తొలిరెంచలు = early humans
+ఏలివెలుగు పుట్టుక బిసెర్మి = artificial light-producing technology
+వరవ = service
+తొల్తాప అక్కఱ = basic need
+మేలెంపులు = శుభాకాంక్షలు
+వెలుగోలి = దీపావళి
+వ్రాపరపం = ప్రచారం, campaign
+అకపాటి (n. అన్యాయం/injustice)
+అచ్చుపాటు (n. ప్రభావం/influence)
+అనడం (n. saying)
+అను (v. say)
+అనుకోలు (n. opinion)
+అనుకోలు (n. అభిప్రాయం/opinion)
+అనిమానకం (n. hypocrisy)
+అనిమానువు (n. Hypocrite)
+అమ్మకము (n. sale)
+అమ్మడం (n. selling)
+అమ్ము (v. sell)
+అమ్ముకోలు (n. business)
+అయినిల్క (n. పరిస్థితి/situation)
+అరుము (v. ఆక్రమించు/occupy)
+ఆకళింపు (n. అవగాహన/understanding)
+ఆతలి (adj. అతీతం/transcendent)
+ఆమతించు (v. సృష్టించు/create)
+ఇరుకువులు (n. సంకుచితులు/narrow-minded people)
+ఈ ఎడాటమై (adv. ఈ విషయమై/on this matter)
+ఉల్లాపగా (adv. మానసికంగా/mentally)
+ఉల్లం (n. mind/మనసు)
+ఎడాటం (n. విషయాన్ని/topic)
+ఎదుర్చెయిదిటి (adj. ప్రతిచర్యాత్మక/reactionary)
+ఎదురేఁక (adj. వ్యతిరేకం/opposite)
+ఎలసీమటిగా (adv. అంతర్జాతీయంగా/internationally)
+ఎల్లరు (n. all persons, all men)
+ఎల్లవాడు (n. every man, everyone)
+ఎల్ల (adj. all, whole)
+ఎసకట్టు (v. నిర్మించు/build)
+ఎసమారిక (n. పరిణామం/evolution)
+ఏటాలు (n. పార్టీలు/parties)
+ఏలి (adj. కృత్రిమం/artificial)
+ఏఱువ-సరి (adv. ప్రాంతాల వారీ/region-wise)
+ఓగులు (n. విలన్లు/villains)
+కటిమి (n. సూత్రం/principle)
+కడ్డాయం (n. బలవంతం/force)
+కతం (n. కారణం/reason)
+కనురోక (n. దృక్కోణం/perspective)
+కరసీమ త్రెవ (n. కోస్తా కులం/Coastal caste)
+కరసీమ (n. కోస్తా/Coastal region)
+కరోలి (n. వాతావరణం/environment)
+కరివందాలు (n. ఆధారాలు/evidence)
+కరివందాలు (n. సాక్ష్యాధారాలు/evidence)
+కాకడ (n. తత్త్వశాస్త్రం/philosophy)
+కంటగించు (v. ద్వేషించు/hate)
+కంటు (n. ద్వేషం/hatred)
+కుదురం (n. మూలం/origin)
+కారు (n. కాలం/time)
+కెలసరి (n. కార్యకర్త/activist)
+కొల్వలి (n. మతం/religion)
+కైవళ్ళు (n. పద్ధతులు/methods)
+కూఱిమీ (n. ప్రేమ/love)
+కాంగ్రెస్ ఏటం (n. కాంగ్రెస్ పార్టీ/Congress party)
+కొంతకారు (adv. కొంతకాలం/for some time)
+గెలుకానుగా (adv. జయప్రదంగా/successfully)
+గావై పోయినది (adj. బలై పోయినది/sacrificed)
+గుండెనిండుగా (adv. హృదయపూర్వకంగా/wholeheartedly)
+చదవడం (n. reading)
+చదువరి (n. student/reader)
+చదువు (n. education)
+చదువుల అమరం (n. విద్యావ్యవస్థ/education system)
+చదువు (v. read/study)
+చేనీవించు (v. అనుమతించు/allow)
+చొఱకం (n. జోక్యం/interference)
+జరిపిడి చెయ్యడం (v. అమలు చెయ్యడం/implement)
+జరిపిడి (v. అమలు/implementation)
+జరిమి (n. చరిత్ర/history)
+జర్మి (n. చరిత్ర/history)
+తడకారు నెళవర్లు (n. చిర పరిచితులు/acquaintances)
+తనకం (adv. సహజం/natural)
+తన్పేఱిమి-మేగలి (n. ఆత్మగౌరవ ఉద్యమం/self-respect movement)
+తనివిమాలిక (n. అసంతృప్తి/dissatisfaction)
+తరుకౌట (n. పర్యవసానం/consequence)
+తలక్రిందుల వాపఱపం (n. reverse propaganda)
+తలపెటకం (n. సంకల్పం/resolution)
+తఱి (adv. సమయం)
+తందరుసు (adj. సాధారణం/normal)
+తినడం (n. eating)
+తిను (v. eat)
+తినుబాటు (n. subsistence)
+తెన్-ప్రంగాణీలు (n. దక్షిణ భారతీయులు/South Indians)
+త్రాగడం (n. drinking)
+త్రాగు (v. drink)
+త్రాగునీరు (n. drinking water)
+త్రాగుబోతు (n. drunkard)
+త్రెవ-తేడాలు (n. కులభేదాలు/caste differences)
+త్రేసుగౌర (n. జాతిద్రోహి/traitor)
+త్రేసు (n. జాతి/caste)
+తెఱపగా (adv. బహిరంగంగా/openly)
+తెఱపోలగం (n. బహిరంగ సభ/public meeting)
+తెఱాట (n. సినిమా/cinema)
+తిండి (n. food)
+తోఁబుట్టుకం (n. సౌభ్రాత్రం/brotherhood)
+దన్నుకాను (n. మద్దతుదారు/supporter)
+నడక (n. walking)
+నడవడి (n. behaviour)
+నడుచు (v. walk)
+నడిపెన (n. operator)
+నిక బ్రదిమానం (n. జీవితం/life)
+నంజ-కలగం (adj. విషపూరితం/poisonous)
+నౌటాలరి (n. హాస్యగాఁడు/comedian)
+నుడికట్టు (n. grammar)
+నుడికానువు (n. భాషారూపం)
+నుడియాదటులు (n. భాషాభిమానులు)
+నుడియాదట (n. భాషాభిమానం/language pride)
+నుడి (n. భాష/language)
+నుడి (n. Language/భాష)
+నెరిమ (n. భక్తి/devotion)
+నేస్త-చుట్టఱికాలు (n. స్నేహ బాంధవ్యాలు/friendships)
+నేఱికలు (n. పాఠాలు/lessons)
+పడక (n. bed)
+పడడం (n. falling)
+పడు (v. fall/lie)
+పదిగాల పాటు (adv. దశాబ్దాల పాటు/for decades)
+పరపటి (n. పరపతి/reputation)
+పరికానులు (n. నాయకులు/leaders)
+పరిపారివాన్లు (n. సమ్రాట్టులు/emperors)
+పరియం (n. జనాభా/population)
+పాట (n. song)
+పాటకాను (n. singer)
+పంటకం (n. ఫలితం/result)
+పెట్టుడు మార్పు (n. కృత్రిమ మార్పు)
+పాడడం (n. singing)
+పెడసూటిగా (adv. indirectly)
+పాడు (v. sing)
+పెన్వల (n. అంతర్జాలం/internet)
+పొరపొచ్చాలు (n. అభిప్రాయ భేదాలు/differences of opinion)
+పారఁజూడ్కి (n. గమనిక/note)
+పేరు-పెరిమలు (n. పేరుప్రతిష్ఠలు/fame and prestige)
+పేఱిమీ (n. గౌరవం/respect)
+బిమ్మిటి (n. అనుమానం/doubt)
+మట్టం (n. స్థాయి/level)
+మన్యాలు (n. రాజ్యాలు/kingdoms)
+మరుదేర్చు (v. పునరుద్ధరించు/restore)
+మల్క (n. question)
+మఱియు ఉల్లటం (adv. And vice versa)
+మేగలి (n. ఉద్యమం/movement)
+మేగలి (n. ఉద్యమం/movement)
+మేదకులైన (adj. అమాయకులైన/innocent)
+మంది ఉల్లాలు (n. జన మనస్సులు/people’s minds)
+మునువైతులు (n. హిందువులు/Hindus)
+మొప్పెంగా (adv. మూఢంగా/foolishly)
+మామఱిదం (n. పునరావృత్తం/repetition)
+మార్తం (n. శత్రుత్వం/hostility)
+మేరం (n. పటం/map)
+ముందటులు (n. పూర్వీకులు/ancestors)
+రా-కందోలి (n. రాజవంశం/royal dynasty)
+రా-నుడి (n. రాజభాష/royal language)
+లో (p. in)
+లోగుట్టు (n. మర్మం, మతలబు/secret, hidden meaning)
+లోపల (n. inside)
+లోపేటు (n. input)
+లెప్పాలు (n. లక్ష్యాలు/goals)
+లోలోపలి పురికొల్పులు (n. అంతర్గత ప్రేరణలు/internal motivations)
+లాసీమరులు (adv. విదేశీయులు/foreigners)
+లోసీమ (n. రాష్ట్రం/state)
+వాకువ (n. కథ/story)
+విచ్చుకం (n. స్వాతంత్ర్యం/independence)
+వేటు (n. put)
+వాడుకనుడివాటులు (n. వ్యావహారిక భాషావాదులు)
+వేయడం (n. putting)
+వేయు (v. put/place)
+వెరసు (n. సంఖ్య/number)
+వ్రాత (n. composition)
+వ్రాతరి (n. writer)
+వ్రాయడం (n. writing)
+వ్రాయు (v. write)
+వేరం (n. విగ్రహం/idol)
+వెఱపు (n. భయం/fear)
+వెఱ్ఱి ఆదట (n. దురభిమానం/fanaticism)
+వేందట్టు (v. ప్రోత్సహించు/encourage)
+సాతం (n. పాత్ర/role)
+స్రుక్కులు (n. బాధలు/sufferings)
+సీ-పఱపాల చెలరేఁగుడు (n. దుష్ప్రచారాల విజృంభణ/spread of propaganda)
+హత్తరం (n. ప్రభావం/influence)
+హొంతాలు (n. పరిశ్రమలు/industries)
+హా-నెమ్మనాలు (n. శాంతిసౌఖ్యాలు/peace and prosperity)
+ఱేళ్ళు (n. రాజులు/kings)
+తప్పు (n. wrong/దోషం)
+అక, అక్క (n. Big sister)
+అక్కజం (n. Wonder)
+అక్కడ (adverb. There)
+అక్కఱ (n. Neccesity)
+అగ<-అదిగో (interjection. look!)
 
 
-router = APIRouter(
-    prefix="/language"
-)
 
+ఎదురేక మాటలు (opposite words)
+fail (ఓడు) – succeed (నెగ్గు)
+failure (ఓటమి) – success (నెగ్గు)
+false (తప్పు) – true (ఒప్పు)
+far (ఎడ) – near (దగ్గర)
+fast (తొందర) – slow (మెల్లగా)
+fat (కొవ్వు) – slim (సన్న)
+fear (బెదురు) – courage (ఉక్కు)
+female (ఆడ) – male (మగ)
+few (కొన్ని) – many (చాలా)
+final (కడ, తుద) – first (తొలి)
+find (వెతుకు) – lose (పోగొట్టు)
+finish (ముగి) – begin (మొదలు)
+finish (ముగించు) – start (మొదలుబెట్టు)
+fix (సరిచేయు) – break (పగలగొట్టు)
+flat (చదును) – hilly (గుట్టల)
+floor (నేల) – ceiling (కొయ్య, మేడ)
+follow (తొడరు) – lead (దావరించు)
+forbid (ఆపు) – allow (కాని)
+for (కోసం) – against (ఎదురేకం)
+foreground (ముందుబైలు) – background (వెనకబైలు)
+foreign (లాతి) – domestic (నాటు)
+foreigner (లాతివాను) – native (నాటు)
+forget (మరచు) – remember (గుర్తుపట్టు)
+form (ఏర్పరచు) – destroy (కడతేర్చు)
+fortune (ప్రాయి) – bad luck (కోవేటు)
+forward (ముందుకు) – backward (వెనుకకు)
+free (విడుదల) – arrest (పట్టివేత)
+freeze (గడ్డకట్టు) – melt (కరుగుట)
+frequently (తరచుగా) – occasionally (అప్పుడప్పుడు)
+fresh (కొత్త) – old/stale (పాత)
+friend (నేస్తం) – enemy (పగఱ)
+front (ముందు) – rear (వెనుక)
+in front of (ముందు) – back (వెనుక)
+full (నిండిన) – empty (వట్టి)
+funny (నవ్వులాటం) – serious (రేఁకం)
+future (తరువాయి) – past (పోయినది)
 
-@router.get("/files")
-async def list_files():
+అసలు (original) = నికాప, నిజమైన :
 
-    return {
-        "files": get_language_files()
-    }
+నకిలీ (fake) = బవంతం : బవంత డబ్బు;
 
+అసలు(ఏమాత్రం) = బొత్తిగా : బొత్తిగా నామాట వినడు
 
-@router.get("/content/{filename}")
-async def get_file_content(
-    filename: str
-):
+సందేశం (Message) = వేగు
 
-    safe_name = Path(filename).name
+కబుర్లు (Chatter/gossips) ఊసులు : ఊసులాడు
 
-    file = LANGUAGE_DIR / safe_name
+సమాచారం(information) = తెలిమానం.
 
-    if not file.exists():
-        raise HTTPException(
-            status_code=404,
-            detail="File not found"
-        )
+జాగ (place) - చోటు, ఇక్కు, పట్టు, చేరుగడ
 
-    if not file.is_file():
-        raise HTTPException(
-            status_code=400,
-            detail="Not a file"
-        )
+జవాబు(answer)- పలుకు : అడిగినదానికి పలుకు/మారుపలుకు.
 
-    return PlainTextResponse(
-        file.read_text(
-            encoding="utf-8"
-        )
-    )
+సమయం/కాలం(time) - పొద్దు, కారు : పొద్దుపోలే, ఎంతపొద్దు కావాలి నీకు, ఈ పొద్దంతా దండగా.
 
+నమస్కారం - దండం/టేంకణం
 
-@router.post("/upload")
-async def upload_file(
-    file: UploadFile = File(...)
-):
+దుకాణం(shop) - అంగడి
 
-    extension = Path(
-        file.filename
-    ).suffix.lower()
+ఖర్చు (Cost) : ఖర్చు చేయద్దు : చిందువందు చేయద్దు.
 
-    if extension not in {
-        ".txt",
-        ".md",
-        ".json",
-        ".csv"
-    }:
+Request/appeal - మనవి.
 
-        raise HTTPException(
-            status_code=400,
-            detail="Unsupported file type"
-        )
+Location - నెలకువ.
 
+Storage/stock - నిలవ.
 
-    LANGUAGE_DIR.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+రుణం - అరువు, అప్పు, వారకం : బండి / ఇంటివారకం (వాహన/home loan).
 
+శుభ్రం చేయి - ఉసుము.
 
-    filename = Path(
-        file.filename
-    ).name
+నాశనం చేయి - ఉండకుండా చేయి : వాడనుకుంటే ఏముండకుండా చేస్తాడు (సర్వనాశనం)
 
+misfortune/దురదృష్టం - చేటు.
 
-    destination = (
-        LANGUAGE_DIR / filename
-    )
+ధ్వంసం/destruction చేయి - డప్పిచే
 
+Face: మొకము, మొహము, మోము
 
-    content = await file.read()
+Pimple: మొటిమ, చెమటకాయ
 
+Eye: కన్ను
 
-    destination.write_bytes(content)
+Eyelid: ఱెప్ప
 
+Eyebrow: కనుబొమ్మ
 
-    return {
-        "success": True,
-        "filename": filename
-    }
+Eyelash: ఱెప్పవెంట్రుక
+
+Retina: కంటితెర, కంటిపొర
+
+Pupil: కంటిపాప
+
+Eyeball: కంటిగుడ్డు
+
+Forehead: నుదురు
+
+Nose: ముక్కు
+
+Nostril: ముక్కుకోవి, ముక్కుగోడి, ముంజెరమ
+
+Snout, beak: ముట్టె
+
+Mouth: మూతి, నోరు, వాయి
+
+Corner of mouth: చెలవి
+
+Lip: పెదవి
+
+Under lip: ఔడు, అవుడు
+
+Chin: గద్దువ
+
+Mustache: మీసము
+
+Beard: గడ్డము
+
+Cheek: బుగ్గ, చెక్కిలి
+
+Inside of cheek: పుక్కిలి
+
+Inside or hollow of mouth: బుక్క
+
+Tooth: పన్ను
+
+Tongue: నాలుక, నాలిక
+
+Tonsil: గళగుటిక
+
+Trachea: పీకె
+
+Throat: గొంతు
+
+Neck: మెడ
+
+Head: తల, నెత్తి, బుఱ్ఱ
+
+Back of head: పెడతల
+
+Face turned away: పడము
+
+Skull: పుఱ్ఱె
+
+Eustachian tube: చెవిగొట్టము
+
+Body: ఒడలు, ఒళ్లు, మై, మే, మేను, మెయి
+
+Bone: ఎముక, దుమ్ము, బోకె, బొమిక
+
+Joint: కణుపు, కీలు
+
+Skeleton: డొక్క, ఎముకలగూడు(lit. “bone cage”)
+
+Skin: తోలు, తొక్క, తాట
+
+Hair: జుట్టు(on head), వెంట్రుక(లు)
+
+Muscle: కండ
+
+Nerve, vein, artery: నరం
+
+Brain: మెదడు
+
+Heart: గుండె, ఎడ్జ, గుండెకాయ
+
+Liver: కార్జం
+
+Stomach, womb: కడుపు
+
+Lung: ఊపిరితిత్తి
+
+Intestine, gut, bowel: ప్రేగు
+
+Belly, paunch: బొజ్జ, పొట్ట
+
+Navel: బొడ్డు
+
+Gallbladder: చేదుకట్టు
+
+Penis: మగగుఱి, చుల్లి
+
+Testicle: విత్తు, బుడ్డ
+
+Vagina: ఆడుగుఱి, దుబ్బ, కుయ్య
+
+Clitoris: గొల్లి(కాయ)
+
+Kidney: ఉలవకాయ, పక్కెరగుండె
+
+Bladder: ఉచ్చబుడ్జ, నీరుతిత్తి
+
+Mind: ఉల్లము, లోను, డెందము
+
+Vital part of body, private parts: ఆయము
+
+Torso: మొండెము
+
+Back: వెన్ను, వీపు
+
+Spine: వెన్నెముక
+
+Spinal cord: వెన్నుపాము
+
+Vertebra: వెన్నుపూస
+
+Lower spine: ముచ్చ
+
+Shoulder, upper part of back: మూఁపు
+
+Armpit: చంక, సంక
+
+Behind, Buttock: పిఱ్ఱ, పిరుదు
+
+Anus: ముడ్డి, కుట్టె
+
+Rib: పక్కటెముక
+
+Chest, bosom, breast: అక్కు, బోర
+
+Breast, teat: చన్ను, గుబ్బ
+
+Nipple: చనుమొన, చన్మొన
+
+Leg: కాలు
+
+Knee: మోకాలు, కాలిముడుకు
+
+Foot: అడుగు
+
+Ankle: చీలమండ
+
+Hip: తొంటి
+
+Lap: ఒడి
+
+Thigh: తొడ
+
+Waist: కౌను, నడుము, మొల
+
+Calf of leg: పిక్క
+
+Hand: చేయి, చెయ్యి, కై, కేలు
+
+Arm: చేయి, చెయ్యి
+
+Wrist: మణికట్టు
+
+Forearm: ముంజేయి
+
+Upper arm: దండచేయి, సందిలి
+
+Elbow: మోచేయి, మోచెయ్యి, చేతిముడుకు
+
+Wing: రెక్క
+
+Palm: చేర, అఱచేయి
+
+Finger: వ్రేలు
+
+Knuckle: మెటిక, నెటిక, వ్రేలికణుపు
+
+Nail, claw, talon: గోరు
+
+Tusk, Horn: కొమ్ము
+
+Fang, tusk: కోర
+
+Toe: కాలివ్రేలు
+
+Toenail: క్రీగోరు, కాలిగోరు
+
+Sole: అఱకాలు
+
+Tail: తోక
+
+Fur, wool: బొచ్చు
+
+Scale(eg. on a fish): పొలుసు
+
+Tuft or knot in hair: పిలక
+
+Feather: ఈక
+
+Stinger(especially that of a scorpion): కొండి 
+
+Blood: నెత్తురు, నెత్రు
+
+Marrow: మూలగ, నెనడు
+
+Bile, bilious vomiting: పసరు
+
+Fat, grease: క్రొవ్వు
+
+Urine: ఉచ్చ
+
+Stool: ఏరుగు
+
+Dung of humans, carnivores: పీయి, పియ్యి
+
+Dung of cattle: పేడ
+
+Dung of sheep, goats, hares, deer, or rats: పెంటిక
+
+Dung of horses, asses, elephants, or camels: లద్ది
+
+Dung of birds and fish/shrimp: రెట్ట
+
+Drool: జొల్లు, సొల్లు
+
+Spit: ఉమ్ము
+
+Snot: చీమిడి
+
+Menses: ముట్టు
+
+Male or female ejaculate: సాడు
+
+Tears: కన్నీళ్లు, కన్నీరు, కన్నీటి చుక్కలు/బొట్టులు
+
+Earwax: గుబిలి, గులిమి
+
+Vomit: కక్కు
+
+Sweat: చెమట
+
+Pus: చీము
+
+Breast milk: చనుబాలు
+
+Sight, vision: కనుకలి, చూపు, పారువ, కంటిచూపు
+
+Hearing: వినుకలి, వినికిడి
+
+Sense of smell: మూచూపు, మూర్కోలు
+
+Sense of taste: చవిచూపు, చవిగోలు
+
+Sense of touch, contact: ముట్టుకోలు, తగులుడు
+
+Breath: ఊర్పు, ఊపిరి
+
+Sigh: ఇంకువ, నిట్టూర్పు
+
+Snoring: గుఱక
+
+Heartbeat: గుండెచప్పుడు
+
+Yawn: ఆవులింత
+
+Sneeze: తుమ్ము
+
+Hiccup: ఎక్కిలి
+
+Cough: దగ్గు
+
+Eating: తింట, కుడుపు
+
+Drinking: త్రాగుడు, కుడుపు
+
+Flatulence: పిత్త
+
+Gulp, swallow: గుటక
+
+Blink: ఱెప్పపాటు
+
+Movement: కదలిక
+
+Walking: నడక
+
+Clearing throat: కాండ్రింత
+
+Hawking when spitting: కేకరింత
+
+Pregnancy: చూలు, వ్రేకటి
+
+Delivery: కానుపు, కాన్పు
+
+మైమొత్తం - Full body
+
+మై, మేయి, ఒళ్ళు – body  
+తల - head  
+కీలు – Joint  
+అడుగు – Foot  
+చై, చెయ్యి – Hand
+
+మోవీట్లు - primary parts
+
+తల - head
+మెడ - neck
+రొమ్ము - Breast
+సంక - armpit
+బొజ్జ - belly
+కాళ్లు - legs
+చేతులు - hands
+
+మైవీట్లు - Organs
+
+బుర్ర – Brain  
+గుండె – Heart  
+ఊపిరితిత్తులు – Lungs  
+కారిజం/కాలేయం – Liver  
+కడుపు – Stomach  
+ప్రేగులు – Intestines  
+నీరుపాయి – Kidney  
+తోలు – Skin  
+కన్ను – Eye  
+చెవి – Ear  
+ముక్కు – Nose  
+నోరు – Mouth
+
+నలుసుగం - Tissues
+
+ఎముక – Bone  
+నీసు – Muscle  
+నాడి – Nerve  
+నెత్తురు – Blood  
+పట్టెన – Tendon / Ligament  
+కొవ్వు – Fat
+
+నలుసులు - Cells
+నలనలుసులు – Blood cells
+నాడినలుసులు – Nerve cells
+నీసునలుసులు– Muscle cells
+తోలునలుసులు – Skin cells
+
+నలులు– Atoms
+లోనలులు – Subatomic particles
+
+Ailment, affliction: జబ్బు, నలుకువ
+
+Sickness, disease: నలత, జబ్బు, తెవులు/తెగులు, నొవ్వు
+
+Pain, ache: నొప్పి, పోటు(stabbing pain), మంట(burning)
+
+Agony: తీపు
+
+Fatigue, Exhaustion: అలసట/అలకువ/ఆలయిక, బడలిక
+
+Numbness, paralysis, palsy: తిమురు, తిమ్మిరి
+
+Nausea: వెక్కసము
+
+Vomiting: కక్కుడు
+
+Intoxication: మైకము
+
+Fainting: సోలింత
+
+Drowsiness: జడ్జు
+
+Itchiness: దురద, జిల, దూల, తీంట్రము
+
+Murrain: చీడ
+
+Hunger: ఆకొన్నతనము, ఆకలి, గొద
+
+Thirst: దప్పి, దప్పిక
+
+A cut, wound: గంటు, నర్కు
+
+Sting: కొండి, కుట్టు, చురుకు
+
+Bite: కాటు
+
+A blow, injury: దెబ్బ
+
+Blindness: గ్రుడ్డి, గ్రుడ్డితనము, గుడ్డితనము, చీకు, చీకురు
+
+Deafness: చెవుడు
+
+Limping: కుంటినడక
+
+Lameness: కుంటితనము
+
+Greyness, greying of hair: నర, నరపు
+
+Cold, catarrh, influenza: జలుబు, రొంప, పడిసెము
+
+Fever: వేకి
+
+Leucoderma: బొల్లి, ప్రుంగుడు
+
+Heart attack: గుండెపోటు
+
+Heart Palpitations: గుండెయదురు, నెగ్గురు
+
+Headache: తలయేరు, నెట్టినొప్పి, తలనొప్పి
+
+Scabies: చిడుము
+
+Measles: తడపర
+
+Rabies: కుక్కవెఱ్ఱి
+
+Asthma: ఉబ్బసము
+
+Swelling: వాపు, ఉబ్బరము
+
+Elephantiasis: బోదకాలు
+
+Sprain: బెణుకు
+
+Ischuria: నీరుకట్టు
+
+Cholera: మరిడి
+
+Dermatophytosis: చిరుగుడు
+
+Sore eye, ophthalmia: కంటికలక
+
+మూటు = tool
+మరమూటు = device
+ఎంచుమర = computer
+మరగారం = engineering
+నెంతాది మరగారం = software engineering
+ఉర్వాది మరగారం = hardware engineering
+మరవైని మరగారం = mechanical engineering
+మెఱుం మరగారం = electrical engineering
+
+చేవీనం - cellphone, mobile/hand phone
+చేవీనపు మేవరం - Mobile camera
+చేవీనపు తెఱ - Mobile screen
+చేవీనపు పనిముట్టు - Mobile accessory
+చేవీనపు నిలవ - Mobile storage
+చేవీనపు వ్రాజాటన - Mobile notification
+చేవీనపు పైలం - mobile security
+చేవీనపు వరవలు (services)
+చేవీనపు పల్కు వరవ - Mobile call service
+చేవీనపు వేగు వరవ - Mobile MSG service
+చేవీనపు తెల్వందం వరవ - Mobile data service 
+చేవీనపు వలకట్టు - Mobile network.
+చేవీనపు తెల్వందం - Mobile data.
+చేవీనపు చెల్లింపు - Mobile payment.
+చేవీనపు పనిముట్టులు (accessories)
+చేవీనపు బ్రోంకాను - Mobile charger.
+చేవీనపు వెన్కప్పు - Mobile backcover.
+చేవీనపు తలవీనం - Mobile headphone.
+చేవీనపు బ్రోమాది - Mobile power bank.
+చేవీనపు తెఱఁగాఁపి - Mobile screen protector.
+చేవీనపు నెంతాది (software)
+చేవీనపు ఠవణం - Mobile application.
+చేవీనపు ఆటలు- Mobile games.
+చేవీనపు పనిమారపు అమరం - Mobile operating system.
+చేవీనపు నెంతాది క్రోచీదం - Mobile software update.
+చేవీనపు వయ్యాలికాను - Mobile browser.
+కొరముట్టు పాయలు - hardware parts
+మీటపలక - Keyboard.
+ఎడచూపు - screen/TV.
+గుర్తీవియ - memory card.
+పక్కణి - battery.
+చేవీనపు నిలవ - Mobile storage
+
+ఏలితెలివి - artificial intelligence
+ఏలివాన - artificial rain
+ఏలితోలు - artificial skin
+ఏలిగుండె - artificial heart
+ఏలినవ్వు - Artificial laugh
+ఏలిబ్రతుకు - artificial life
+ఏలిచూపు - artificial vision
+ఏలిమొక్క - artificial plant
+ఏలిపువ్వు - artificial flower
+ఏలివెంట్రుక - artificial hair
+ఏలిగోరు - artificial nail
+ఏలిపళ్ళు - artificial teeth
+ఏలికన్ను - artificial eye
+ఏలిచేయి - artificial hand
+ఏలికాలు - artificial leg
+
+వంతు, ఏడం = వారం, week
+ప్రొద్దువంతు  = రవి వారము, Sunday
+నెలవంతు   = సోమవారము, Monday
+పారిపట్టివంతు = మంగళవారము, Tuesday
+పెద్దవంతు   = బుధవారము, Wednesday
+బేస్తవంతు  = గురువారము, Thursday
+చుక్కవంతు = శుక్రవారము, Friday
+సనివంతు = శనివారము, Saturday
+
+నెల = months
+ముత్తెపురిక్కనెల = చైత్రమాసము, March
+చేతరిక్కనెల   = వైశాఖమాసము, April
+తాటిరిక్కనెల  =  జ్యేష్ఠమాసము, May
+నీటిరిక్కనెల   =  ఆషాఢమాసము, june
+తూఁపురిక్కనెల = శ్రావణమాసము, july
+ముక్కంటిరిక్కనెల = భాద్రపదమాసము, august
+తొలురిక్కనెల   = ఆశ్వయుజమాసము, September
+కత్తెరనెల      = కార్తికమాసము, October
+పొంగటినెల    = మార్గశిరమాసము, November
+పొట్లరూపురిక్కనెల = పుష్యమాసము, December
+జన్నపురిక్కనెల   = మాఘమాసము, January
+ప్రొద్దురిక్కనెల   = ఫాల్గునమాసము, February
+
+Aswani           - తొలు / తొల్లు
+Bharani          - మావి
+Krutthika        - కత్తి / మంగలికత్తి
+Rohini           - బండి
+Mrugasira        - జాబిలి
+Aardra/Aarudra   - కెంప
+Pushyami         - అంప
+Aaslesha         - అసిలేఱు
+Magha            - అందలకోల
+Poorva-phalguni  - సాముకంటి
+Utthara-phalguni - ప్రొద్దు
+Hastha           - కైసాటి
+Chitra           - ముత్యపు సవతు
+Visakha          - చేట
+Anuradha         - చెల్మి
+Jyeshta          - తాటి
+Moola            - సోకు
+Poorva-aashaada  - నీటి
+Sravana          - సెవ్వాపి
+Uttharaabhaadra  - ముక్కంటి
+Revathi          - కడచుక్క
+Abhijith         - బొమ్మక / బొమ్మ
+
+కార్తులు = seasons
+ఆమని        - spring
+వేసవి         - summer
+వలి          - premonsoon
+వానకారు      - monsoon
+వెలిమి        - autumn
+చలి          - winter
+ఐదుసురులు = పంచభూతాలు, five elements
+నేల       - భూమి, earth
+నీరు      - జలం, water
+గాలి      - వాయువు, air
+నిప్పు    - అగ్ని, fire
+మిన్ను    - ఆకాశం, sky
+
+విన్నరం = గ్రహం, planet
+నెసరు       - సూర్యుఁడు, sun
+జాబిలి      - చంద్రుఁడు, moon
+కెంబలి      - కుజుఁడు, Mars
+నెలాత      - బుధుఁడు, Mercury
+కాంచువు     - బృహస్పతి, Jupiter
+వేగుపలి     - శుక్రుఁడు, Venus
+గాడ్పలి     - శని, Saturn
+మెదలాలు = భావాలు, feelings
+ఏల        - శృంగారః
+నవ్వు      - హాస్యః
+జాలి      - కారుణ్యః
+కినుకు    - రౌద్రః
+చేవ        - వీరః
+దడపు      - భయానకః
+ఱోత        - బీభత్సః
+ఱిచ్చకం   - అద్భుతః
+మట్టసం    - శాంతః
+
+East            | తూర్పు     | పూర్వ
+West            | పడమర     | పశ్చిమ
+North           | డాకడ/ఎడకడ| ఉత్తర
+South           | వలకడ/కుడికడ| దక్షిణ
+North East      | కడకడ      | ఈశాన్యం
+South East      | చిరిమూల    | ఆగ్నేయం
+North West      | ఈదాటి     | వాయువ్యం
+South West      | సోఁకుమూల   | నైరుతి
+    
+ఎప్పుడూ (Always)
+అలవాటుగా (Usually)
+ఎక్కువగా (Normally)
+తరచుగా (Often)
+కొన్నిసార్లు (Sometimes)
+అప్పుడప్పుడు (Occasionally)
+అరుదుగా (Seldom)
+చాలా అరుదుగా (Rarely)
+ఎప్పుడో (Hardly ever)
+ఎప్పుడూ కాదు/లేదు (Never)
+    
+అడ్డ (Horizontal)
+నిలువు (vertical)
+ఐమూల (Diagonal)
+తెగీటు (Dashed)
+చుక్కల (dotted)
+టింకర (zig zag)
+వంకర (curved)
+కెఱటాప (wavy)
+చుట్లం (loop)
+సుడి (spiral)
+తోడ్తోడి (parallel)
+నిట్టనిలువు (perpendicular)
+గజిబిజి (scribbled)
+చిక్కని(Thick)
+చిక్కిన (Thin)
+నెఱిటింకర (scallop)
+
+అనుప (n. Post)
+తిరిగనుప (n. repost)
+హెచ్చింపు (n. promotion)
+పరియాదట (n. popularity/trend)
+మెప్పు (n. Like)
+మీఁదువల్కు (v./n. comment, to comment)
+పంచుకొను (v. to share)
+పంచుకోలు (n. share)
+తొడరు (v. to follow)
+తొడరిక (n. following)
+తొడరుకాను (n. follower)
+పరిగానరి (n. viewer)
+పరిగానకం (n. view)
+పరిగానుచు/చూడు (v. to view/watch)
+తెలిపి (n. bio/introduction)
+పొడకాను (n. profile)
+వేగు (n. message)
+వేగు పంపు (v. to message/send a message)
+వ్రాజాటన (n. notification)
+గుంపు (n. group)
+నెఱపరి (n. admin/moderator)
+    
+మన్కిమిన్కు(ఆయుర్వేదం)
+తొల్బల్కు (వేదం);
+తలఁపు( స్మృతి);
+ప్రాతముచ్చట (పురాణం);
+మందరి(వైద్యుడు);
+తలపోయు(ఆలోచించు);
+కలిమి (విత్తము);
+ఓజ (స్వభావం);
+ఏర్పర్చఁబడును (సృజింపబడును);
+అబ్బాటుగా (ఆకస్మాత్తుగా)
+అలుక (క్రోధము)
+అంగూరు(ద్రాక్ష)
+ఉసురుగీత (ఆయురేఖ)
+ఉసురుతాల్పు (భూతం - ప్రాణి)
+ఉసురుమిన్కు(ఆయుర్వేదం)
+ఉసురు నిల్కడలేనిది (ప్రాణం అస్థిరం)
+ఎల్లబలుపుల (విషయాల)
+ఎండిననంజుడు(శుష్కమాంసం)
+ఏడుగడ (రక్షక)
+ఏడుదినుసులు(సప్తధాతువులు)
+ఐదుమైదినుసులు (పంచేంద్రియాలు)
+ఒడమి (ధనము)
+ఒలికిపొగ (శ్మశానధూమం)
+ఓజలు (గుణములు)
+ఓపిక (బలం)
+ఓ ఉసురులారా! (ఓ జీవుల్లారా)
+కట్టుపాటు (శాస్త్రం)
+కడళ్ళు (సాగరములు)
+కలిమి (ఐశ్వర్యం)
+కఱద (చిత్తం - బుద్ధి - మనసు)
+కాచుకొనుట (కరతాపనము)
+కోడెయీడు (యౌవనం)
+క్రొత్తడి ఇల్లాలు (పతివ్రత)
+కారు (అడవి)
+క్రిందులు (పాతకములు)
+కాళ్ళదుమ్ము (రజము)
+కొండుమేనులఁ (దేహాంతరం)
+గొంటు (రోగి)
+చదువరి(విద్వాంసుడు)
+చియ (మాంసం)
+చేరిక (సంగం)
+చూలునడుమ (పిండమధ్యమున)
+చేవ (బలము)
+చీఁదఱ (పీడ)
+డారు(అప్రతిష్ఠ)
+డెందము (మనస్సు)
+తనపని (స్వకర్మ)
+తఱి (కాలము)
+తెగ (జాతి)
+తెగులు (వ్యాధి)
+తేరు (రధము)
+తిండిచిలుము(విషం)
+దిగులుగొంతు (ధీమస్వరం)
+దెత్తితనం (ప్రేతత్వం)
+దొరతనం (రాజ్యం)
+దొరయఱతెవులు (రాజయక్ష్మ)
+నడత (శీలం)
+నలువగ్రుడ్డు (బ్రహ్మాండం)
+నిట్టపుట్టువు (నరసింహ)
+నెత్తురు (శోణితం)
+నొప్పి (దుఃఖం)
+నెమ్మది (స్వస్థం)
+నేలలయోజ(పంచభూతత్వం)
+నేలంకలు (ద్వీపములు)
+నింగినేలదినుసులు(లోకాలు)
+నింగినేల (జగము)
+నింగి (ఆకాశం)
+పగఱు = వైరి
+పగ (ద్వేషం)
+పడుచు (కన్య)
+పొగరు (అహంకారం)
+పుట్టుకగలవారు (జన్మవంతులు)
+పాడెగట్లు (పాపిస్తులు)
+పాడిగా (స్వధర్మముచేత)
+పాడి (ధర్మం)
+పొద్దు దొట్టి తొమ్మిది మింటిమినుకులు(ఆదిత్యాది నవగ్రహములు)
+పెరుమాళ్లు (ధన్వంతరి)
+పాలబువ్వ (క్షీరభోజనం)
+పోసనము కడలి చిలుకుతఱి (క్షీరసముద్ర మధనకాలమున)
+పాఱులు (బ్రాహ్మణులు)
+దొరలు (క్షత్రియులు)
+కోమటులు (వైశ్యులు)
+కాపులు (శూద్రులు)
+వేల్చునగరుచెస్తలు (స్వ్పర్గనరకములు)
+పెండ్లికావించుకొని (స్వయంవరమాడ
+పెంద్రోవ (మోక్షం)
+మక్కువ (రాగం)
+మూతిమారుపు (ముఖభంగం)
+మైదినుసు (ధాతువు)
+మేనితాల్పు(జీవి)
+మేనిలోఁగోర్కి(కామము)
+మాపు (రాత్రి)
+మేరువు (వేల్పుల ఇల్లు)
+మేల్కీడులు (పుణ్యపాపములు)
+మైవంతు (ఇంద్రియం)
+ముసలులు (వృద్ధులు)
+మాఱuపుట్టువు (పునర్జన్మ)
+మెఱపు (విద్యుత్)
+వట్టిది (నిష్ఫలం)
+వమ్ము (వ్యర్థం)
+విత్తనము (శుక్రము)
+వీను (చెవి)
+వేల్మి (యజ్ఞం)
+సోఁకు (ప్రేతము)
+    
+ఎలారం: విశ్వం
+ఒసంగాడు : ప్రసాదించాడు
+కడమాలిన : endless
+కానసంకుడు : లోకేశ్వరుడు
+కానస : లోక
+కాఱిస్తూ : హింసిస్తూ
+గంగినేల : పవిత్ర భూమి
+గంగి = పవిత్రం
+చొక్క : pure
+చూలికడలి : గర్భ సాగరం
+తరుకుందు : పరితాపం
+తందరసు : సాధారణ
+తామట్టు : స్వార్థం
+తెఱిపి : ఉపశమనం
+నలువ : బ్రహ్మ
+నుడింపు = అనువాదం
+నిమ్మళంగా : శాంతంగా
+పెక్కు : అనేక
+పారిగుండ్రం : భూమండలం
+బకుర : భయంకర
+మిక్కుటమైన : పుష్కలం
+మిహి : శ్రీ
+మిఱుఇలంకుడు : పరంధాముడు
+రక్కిసపూట : అనుచిత సమయం
+రెంచ : మనిషి
+వాకువ = కథ
+వంచ వనరులు : ముఖ్య వనరులు
+వెడఁద : విశాలమైన
+వేల్పు : దేవుడు
+హాయి అలరు : సుఖసంతోషం
+    
+ఎడాటం - విషయ / subject/matter
+పరియ - అంశం / topic
+ఎగ్గుర్తు - సారాంశం
+తెలిమి - పరిజ్ఞానం / Knowledge 
+నిఱం - విషయవస్తు / Content 
+కతన - logic
+విడఁబర్పు - Explanation 
+ఆకళింపు - understanding
+లోరువులు - వివరాలు / Details 
+లోరువాటి - detailed 
+మునుచెప్పిదం - premise/primary statement
+తలపోత - చింతన / thought
+కనుగోలింపు - విచారణ / inquiry
+నేటు - నిర్ణయం / decisions
+పసించు - గ్రహించు / to comprehend
+నుడింపు - అనువాదం / Translation, Interpretation 
+మీఁదువల్కు/మీఁదువల్కరం - వ్యాఖ్యానం / Commentary, Annotation 
+విరలింపు - విశ్లేషణ / Analysis 
+విరలాది - విశ్లేషణాత్మక వివరణ
+తెఱకువ - వివేకం / Discernment 
+తేఁటదనం - స్పష్టత / Clarity 
+విఁడబర్చుడు - వివరణాత్మకం / Explanatory 
+మెదలం - భావన / imagination/notion
+అనుకోలు - అభిప్రాయం / Opinion 
+గుఱికోలు - ఉద్దేశం / Intention 
+ఆలకం - అవధానం /attention
+అరగలి తీరింపు - సందేహ నివృత్తి / Doubt clarification 
+చాటన - ప్రకటన/declaration
+వాగీటు - వర్ణన / వర్ణించు
+చూపకం - presentation
+తేఱిచూడ్కి - observation
+వాగీటువ గుమిలెక్కరం - వివరణ గణన / Descriptive statistics
+మెండీట - criticism
+బిమ్మిటిపాదు - doubtful
+
+తన్పాటికం - self rule
+విచ్చుకం - freedom
+విడుమర - emancipation
+తావిచ్చుకం - autonomy
+విడుదల - release
+
+పునాది = పలవకట్టు, పాసు, మట్టుగల్లు;
+అమలు = జరిపిడి;
+కబుర్లు = ఊసులు;
+జేబు = పొదెం, పొదియం;
+తర్జుమా/అనువదించు = నుడించు;
+దరఖాస్తు = వాసరాంకు;
+దర్జా = ఠీవి;
+మజా = సోలి;
+ముస్తాబ్ = తీర్కోలు;
+హక్కు = తార్మి;
+హద్దు = మేర, ఎల్ల, బరి;
+తరహా = తెఱంగు;
+దుప్పటి = లేపు;
+మాములు = తరుచు;
+మాజీ = తలిక
+జవాబు = పలుకు, మార్పల్కు
+నిఘా =
+ఆఖరి = చివరి, కడపటి
+బదిలీ = మారాణం
+బదులు = మారు
+బకాయి = పరచి
+అసలు = నికాప, నిజమైన
+తరపు = ఏటము (నువు ఎవరేటము)
+సలహా - చేంబల్కు;
+సామాన్లు = ఉరువాది/ఉరాది;
+రోజు = నాడు, ప్రొద్దు, పూట;
+హుండీ = తాఱపం, ఉండిగ;
+చిరునామా = ఉను వలతి/ఉన్వలతి;
+రాజీనామా = కేడన;
+సవాలు= డుర్రుచు, దువ్వు;
+జోడి = జత;
+హోదా = సపాట;
+సరఫరా ,= పార్నంపు;
+గిరాకీ = ఎగంబాటు;
+రవాణా = పెఱికాటం;
+కాగితం = ఏలాంకు;
+ఖాళీ = కొల్ల, డొల్ల;
+కాలం = ఎడరు, కారు;
+తయారు = సయారం;
+వాయిదా = అసర;
+తమాషా = ఒల్లెక్క;
+కచేరి = ఇసాటం;
+నమూనా = మాదిరి;
+ఫిర్యాదు ,= మిందాట;
+దర్యాప్తు = కనుగోలింపు;
+
+రోజు = నాడు, పొద్దు, ముప్పూటలు.
+బంద్ = మూసివేత
+బజార్ = సంత
+దుకాణం = అంగడి, కొట్టు
+షహర్ = ప్రోలు, వీడు, వటారు
+జమీన్ = నేల, పట్టు, పారి
+తేజం = మిసమిస, మిసారం (full energy)
+తహసీల్దార్ = పన్నులదొర, రాబడులదొర
+జమీందారు = నేలదొర
+ఖర్చు = వెచ్చం
+బస్తా = సంచి
+ఖజానా = బొక్కసం, ములుగు
+కబాబ్ = నీసువంటకం
+దర్వాజా = తలుపు, వాకిలి, తూర్మాను
+హుషారు = కేరింత
+దిల్ = గుండె, ఎడంద, డెంద, కందన
+ఖుషి = మురుపు, పొంగు
+రంగ్ = కౌరు
+గులాం = బానిస
+గులాబి = పెస్సెపూవు
+దోస్త్ = నేస్తుడు, చెలికాడు, చెలి
+ఫౌజ్ = పడ, లెంకోరు
+mother = తల్లి, అమ్మ
+
+కానువు (Appearance) : అందమైన, ఆకట్టుకోగల, పొడవైన, మెరుపుగల, మొదలైనవి…
+మైబారు (size) : పెద్ద, చిన్న, లావు, సన్న, పొడువు, మోటు, పెలుచ మొదలైనవి…
+మైగిరి (shape) : గుండ్రం, నలుమర, తేటమైగిరి, గజిబిజి మొదలైనవి…
+కౌరు (color) : ఎర్ర, నల్ల, తెల్ల, పచ్చ, బూడిద, బంగారు, మొదలైనవి…
+తనరం (quality) : మంచి, చెడ్డ, గట్టి, ఉలకాంగా, పోతరం, మొదలైనవి…
+నిలక (state) : కొత్త, పాత, బాగున్న, చెడిపోయిన, మురికిగా, ఒబ్బిడి మొదలైనవి…
+మెదలం (feeling) : అలరాటం, కుందు, కనలు, అక్కజం, కూర్మి మొదలైనవి…
+చవి (taste) : తీపి, కారంగా, పుల్లగా, చేదుగా, ఉప్పుగా మొదలైనవి…
+అలజడి (sound) : నవకంగా, గట్టిగా, కరకరలాడే, మోతిడి (soundless)
+ప్రాయం (age) : చిన్న, పెద్ద, కోడె, ముది
+కరోలి (weather) : చల్లగా, వేడిగా, తేమగా, పొడిగా
+
+• బడి = school
+• మిడియేలు = principal
+• కాంచువు = teacher
+• నేరువాను = student, చదువరి = Reader
+• తరఁగది = class
+• నల్లబల్ల = blackboard
+• వెల్లముక్క = chalkpiece
+• పొత్తం = book
+• నేరిక = lesson
+• వివ్రా = notes
+• వాకువ = story
+• ఇమురం = essay
+• పోహణ = poem
+• వ్రాకోల = pencil
+• రెలుక = pen
+• తుడిపెన = duster, eraser
+• పదనుమూటు = sharpener
+• అరైక = exam
+• మల్క = question
+• మార్పలుకు = answer
+• రాగడ = result
+
+దేవుడు = వేల్పు, అంకుడు , పైవాడు;
+దేవాలయం = గుడి, కోవెల, వేఁడిలి
+ఆరతి = నివాళి
+ఆరాధన = మైసల్పన
+భక్తి = నెరిమ
+ప్రార్థన = వేఁడిక
+మంత్రం = వల్లరం
+యజ్ఞం/హోమం = వేలిమి
+పూజ = కైసల్పన
+తీర్థం = కోవెల్లం
+ప్రసాదం = కోదోంటు, ఒసంగం
+కర్మ = చైవు
+ధర్మం పొసవు
+మోక్షం = విడమానం
+పుణ్యం = గర్గలం
+పాపం = కావళం
+సద్గతి = మేల్గడ
+యాత్ర = కోఁదేఱిక
+పవిత్రం = గంగి
+దీపం = తిర్లిక, తుగ్గలి
+వ్రతం = నోము
+నైవేద్యం = ఆరగింపు
+ఆశీర్వాదం = దీవెన
+కీర్తన = సాయన
+భజన = కేల్తాటు
+సద్గురు = మేల్గాంచు
+
+మోపికారి = responsible person
+పేర్మిపాదు = Respectable
+నికమరి = honest
+కనికారి = compassionate
+నమ్మకం = confidence
+ఓర్చువు = patient (/ఓర్పున్నోడు)
+పాటువాను = hardworking
+నేయనింట = Friendly
+బాసటి = helpful person
+తామట్టు = selfish person
+చెడ్డవాను = bad person
+మొండివాను = stubborn person
+
+🕉️ నలువ (బ్రహ్మ) : "నాలుగు తలలతో చూడగలవాడు"
+🌐 ఇలంకుడు (విష్ణువు) : "ఇలలో ఎక్కడైనా ఉండే అంకుడు"
+☁️ పిడంకుడు (ఇంద్రుడు) : "పిడు శక్తిగల అంకుడు"
+🔱 ముక్కంటి (త్రినేత్రుడు) : "మూడు కన్నుల వాడు"
+🔱 పెనంకుడు (మహేశ్వరుడు) : "పెను అంకుడు (మహా ఈశ్వరుడు)"
+🌺 మల్లాలు /మల్లామి/మల్లన్ని (పార్వతి) : "మలకు చెందిన ఆలు/ఆమి(ఆమె)/అన్ని"
+🛕 గౌరంకుడు (గణేశుడు) : "గౌరు(ఏనుగు) అంకుడు"
+🦚 పోరంకుడు (సుబ్రహ్మణ్య సామి) : "పోరు శక్తిగల అంకుడు"
+అరైక తఱీ = Exam time
+ఆరైకప్రాకం = Examination hall)***
+తఱీ = Time
+ప్రాక కేవాఁకు = Hall ticket
+మల్కాంకు = Question paper
+మార్పల్కాంకు = answer paper
+మీఁదుగాంచరి = invigilator
+వరుసెన్ను = Roll number
+వ్రాకోల డబ్బి = pencil box
+వ్రాతరులు = writers
+
+పాటకాను(singer)
+నడకాను (walker)
+త్రోవకాను(guide/guider)
+పెంపుకాను (developer)
+పాటుకాను (Hard worker)
+విలుకాను(archer)
+రుత్తుకాను(వినాశక/నాశనం చేసేవాడు, destroyer)
+పాలికాను(త్యాగి, sacrificer)
+జరిమికాను (చరిత్రకారుడు, historian)
+ముప్పుకాను(ప్రమాదకర, dangerous)
+క్రచ్చుకాను (ఆశాజనకమైన, hopeful)
+మసటుకాను (pollutant)
+అడంకాను (నివారణ,preventive)
+పరికానికం/పరిగారం(leadership)
+త్రోవగారం(guidance)
+మాటగారం(ఉక్తి చమత్కారం)
+ప్రోదిగారం(పోషకం, nutrition)
+తెలుగువాను (తెలుగు person)
+నేరువాను (విద్యార్థి, student)
+గెలువాను(విజేత/విజేత్రి, Winner)
+ఏలువాను(governor)
+లాతివాను (Other person/thing)
+పరిపారివాను (Emperor/చక్రవర్తి)
+మైవాను (భౌతిక, physical/material)
+నిలువాను(enduring)
+తారివానికం (యాజమాన్యం,ownership)
+ఉజ్జమారి (imaginative person)
+పనిమారి (active)
+బాసటమారి = బాసట ఇచ్చుటయే స్వభావముగా గలవాడు(helpfull). (భావార్థకము : బాసటమారము = సహాయ శీలము, Helpfulness)
+చదువుమారి = చదువుటయే స్వభావముగా గలవాండు(studious person), (భావార్థకము : చదువుమారము = అధ్యయన శీలము, Studious)
+పగలమారి (ప్రతీకారపరుడు, Avenger)
+తలపోతల మారి (యోచనపరుడు, Thinker)
+చదువల్వి = చదువ(దగినది), పఠనీయము (readable)
+వినల్వి = వినందగినది, శ్రోతవ్యము (audible)
+తినల్వి = తినందగినది, భక్షణీయము, eatable
+ఉండల్వి = ఉండందగినది, వసితవ్యము, stayable
+
+ Internet – తమూవల
+ Website – వలగూడు
+ Webpage – వలపుట
+ URL – ఐవనె (ఐకానువు వనర నెలవరి)
+ Browser – వయ్యాలికాను
+ Search Engine – రోపెన
+ Homepage – ఇలపుట
+ Link – లంకె
+ Wi-Fi – తీవ (తీవేగు లేని వల)
+ Broadband – విఱివితౌలం
+ Modem – మిస్కుమార్పెన
+ Router – త్రోవమూటు
+ Hotspot – వలనటారం
+ Email – మెఱంపు 
+ Chat – ముచ్చట
+ Forum – ౙగిల
+ Blog – వలాంకు
+ Social Media – కూటక్రోవియం
+ Comment – మీఁదువల్కు
+ Emoji – మెదలగుర్తు
+ Download – దిగుమతి
+ Upload – ఎగుమతి
+ Attachment – అతుకు
+ Cloud Storage – మొగినిల్వ
+ Streaming – పాఱకాటం
+ Password – మిస్కుమాట
+ Username – వాడుకరిపేరు
+ Spam – అడ్డకమ్మ
+ Virus – తనిగొంటు
+ Firewall – కావలి గోడ
+ Phishing – మోసపు వల
+ Encryption – వ్రాదాఁపకం 
+ Account – పద్దు
+ Login – లోసోరణ
+ Logout – వెలిసోరణ
+ Profile – తనుకోటి
+ Notification – వ్రాజాటన 
+ Update – క్రోచిదం
+ Bandwidth – మిస్కిమరం
+
+**ఎడాటం** - విషయ / subject/matter
+**పరియ** - అంశం / topic
+**ఎగ్గుర్తు** - సారాంశం
+**తెలిమి** - పరిజ్ఞానం / Knowledge 
+**నిఱం **- విషయవస్తు / Content 
+**కతన** - logic
+**విడఁబర్పు** - Explanation 
+**ఆకళింపు** - understanding
+**లోరువులు** - వివరాలు / Details 
+**లోరువాటి** - detailed 
+**మునుచెప్పిదం** - premise/primary statement
+**తలపోత** - చింతన / thought
+**కనుగోలింపు** - విచారణ / inquiry
+**నేటు** - నిర్ణయం / decisions
+**పసించు** - గ్రహించు / to comprehend
+**నుడింపు** - అనువాదం / Translation, Interpretation 
+**మీఁదువల్కు**/**మీఁదువల్కరం** - వ్యాఖ్యానం / Commentary, Annotation 
+**విరలింపు** - విశ్లేషణ / Analysis 
+**విరలాది** - విశ్లేషణాత్మక వివరణ
+**తెఱకువ** - వివేకం / Discernment 
+**తేఁటదనం** - స్పష్టత / Clarity 
+**విఁడబర్చుడు** - వివరణాత్మకం / Explanatory 
+**మెదలం** - భావన / imagination/notion
+**అనుకోలు** - అభిప్రాయం / Opinion 
+**గుఱికోలు** - ఉద్దేశం / Intention 
+**ఆలకం** - అవధానం /attention
+**అరగలి తీరింపు** - సందేహ నివృత్తి / Doubt clarification 
+**చాటన** - ప్రకటన/declaration
+**వాగీటు** - వర్ణన / వర్ణించు
+**చూపకం** - presentation
+**తేఱిచూడ్కి** - observation
+**వాగీటువ గుమిలెక్కరం** - వివరణ గణన / Descriptive statistics
+**మెండీట** - criticism
+**బిమ్మిటిపాదు** - doubtful
+వేహి (సింహం)
+తోబుట్టి/తోబుట్టినోడ (సోదర)
+ఒలవు (ప్రపంచం)
+కానసం/ఆనసం (జగత్తు)
+వటారం/వటారు (నగరం)
+మిన్నువల్కులు (Space Related Words)
+మిన్వాఁక = Galaxy
+మిణుగుత్తి = Star cluster
+సిరిక = Meteor
+తోకజుక్క = Comet
+విన్నరవ = Asteroid
+పాలపుంత/పాలవెల్లి = Milky Way
+విన్నరాలు (Planets)
+నెసరమరం = Solar System
+నెసరు = sun
+జాబిలి = Moon
+నెలాత = Mercury
+వేగుపలి = Venus
+కెంబలి = Mars
+నేలతల్లి / పారిగుండ్రం = Earth
+కాంచువు = Jupiter
+గాడ్పలి = Saturn
+మాతి = Rahu
+సీదరం = Ketu
+🌒 కాఁబల్కర కానాటాలు (Astrological / Celestial Events)
+నెసరుమాటుక = Solar Eclipse (సూర్యగ్రహణం)
+నెలమాటుక = Lunar Eclipse (చంద్రగ్రహణం)
+చుక్కవాన = MeteorShower
+చుక్కప్రేలుడు = Supernova (star explosion)
+పాటకాను(singer)
+నడకాను (walker)
+త్రోవకాను(guide/guider)
+పెంపుకాను (developer)
+పాటుకాను (Hard worker)
+విలుకాను(archer)
+రుత్తుకాను(destroyer)
+పాలికాను(sacrificer)
+జరిమికాను (historian)
+ముప్పుకాను(dangerous)
+క్రచ్చుకాను (hopeful)
+మసటుకాను (pollutant)
+అడంకాను (preventive)
+పరికానికం/పరిగారం(leadership)
+త్రోవగారం(guidance)
+మాటగారం(ఉక్తి చమత్కారం)
+ప్రోదిగారం(nutrition)
+తెలుగువాను (తెలుగు person)
+నేరువాను (student)
+గెలువాను(విజేత/విజేత్రి)
+ఏలువాను(governor)
+లాతివాను (Other person/thing)
+పరిపారివాను (Emperor/చక్రవర్తి)
+మైవాను (physical/material)
+తారివానికం (ownership)
+నిలువాను(enduring)
+ఉజ్జమారి (imaginative person)
+పనిమారి (active)
+బాసటమారి = బాసట ఇచ్చుటయే స్వభావముగా గలవాడు. (భావార్థకము : బాసటమారము = సహాయ శీలము)
+చదువుమారి = చదువుటయే స్వభావముగా గలవాండు (భావార్థకము : చదువుమారము = అధ్యయన శీలము)
+పగలమారి (ప్రతీకారపరుడు)
+తలపోతల మారి (యోచనపరుడు)
+చదువు + అల్వి => చదువల్వి = చదువ(దగినది), పఠనీయము (readable)
+వినన్‌ + అల్వి => వినల్వి = వినందగినది, శ్రోతవ్యము (audible)
+తినన్‌ + అల్వి => తినల్వి = తినందగినది, భక్షణీయము
+ఉండన్‌ + అల్వి => ఉండల్వి = ఉండందగినది, వసితవ్యము
+కలుపుకోలుతనం = adaptability
+హెచ్చుదనం = superiority
+దిగుదనం = inferiority
+వ్రాయాది = lyrics
+ఎంచుపారు అమరాలు = computational systems
+నెంతాది పెంపుకాను/పెంపరి = Software developer
+నెరపోగు పెంపుగారం = Full stack devlopment
+వల పెంపుగారం = web development
+మునుకొన పెంపుకాను/పెంపరి = Frontend developer
+వెనుకొన పెంపుకాను/పెంపరి = Backend developer
+ఆట పెంపుకాను/పెంపరి = Game devloper
+ఏలితెలివి మరకాను = AI engineer
+వాడుకరితెర కాగీటరి = User Interface designer
+తెల్వందాది సరియేలరి = Database administrator
+చేపట్టు నెఱపరి = project manager
+ఉర్వాది బిసకాను = Hardware technician
