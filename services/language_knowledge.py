@@ -12,30 +12,31 @@ Meaning:
     Melimi word = standard Telugu word
 """
 
-import os
+from pathlib import Path
 import re
-import glob
 import threading
+
+
+# ============================================================
+# LANGUAGE DIRECTORY
+# ============================================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+LANGUAGE_DIR = BASE_DIR / "language"
 
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
-LANGUAGE_DIR = os.path.join(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.abspath(__file__)
-        )
-    ),
-    "language"
-)
-
 MAX_KNOWLEDGE_CONTEXT_CHARS = 1200
+
 MAX_KNOWLEDGE_CONTEXT_ENTRIES = 25
 
 
 _lock = threading.Lock()
+
 
 _cache = {
     "mtime_signature": None,
@@ -50,44 +51,36 @@ _cache = {
 
 def _language_files():
     """
-    Return all .txt vocabulary files inside language/.
+    Return all supported language text files.
     """
 
-    if not os.path.isdir(LANGUAGE_DIR):
+    if not LANGUAGE_DIR.exists():
         return []
 
     return sorted(
-        glob.glob(
-            os.path.join(
-                LANGUAGE_DIR,
-                "*.txt"
-            )
-        )
+        LANGUAGE_DIR.glob("*.txt")
     )
 
 
 def get_language_files():
     """
-    Return language files for the language API.
+    Return available language files.
 
-    This is used by routes/language.py.
+    Used by routes/language.py.
     """
 
     files = _language_files()
 
     result = []
 
-    for path in files:
+    for file_path in files:
 
         try:
 
             result.append(
                 {
-                    "name": os.path.basename(path),
-                    "path": os.path.relpath(
-                        path,
-                        os.path.dirname(LANGUAGE_DIR)
-                    ),
+                    "name": file_path.name,
+                    "path": file_path.name,
                 }
             )
 
@@ -102,12 +95,6 @@ def get_language_files():
 # ============================================================
 
 def _current_mtime_signature(files):
-    """
-    Create a signature from file path, modification time,
-    and file size.
-
-    This lets us reload vocabulary only when files change.
-    """
 
     signature = []
 
@@ -115,11 +102,11 @@ def _current_mtime_signature(files):
 
         try:
 
-            stat = os.stat(file_path)
+            stat = file_path.stat()
 
             signature.append(
                 (
-                    file_path,
+                    str(file_path),
                     stat.st_mtime_ns,
                     stat.st_size,
                 )
@@ -136,24 +123,12 @@ def _current_mtime_signature(files):
 # ============================================================
 
 def _parse_file(path):
-    """
-    Read one language file.
-
-    Expected format:
-
-        బాసట = సహాయం
-
-    Returns:
-
-        (standard_word, melimi_word)
-    """
 
     pairs = []
 
     try:
 
-        with open(
-            path,
+        with path.open(
             "r",
             encoding="utf-8"
         ) as file:
@@ -162,15 +137,12 @@ def _parse_file(path):
 
                 line = raw_line.strip()
 
-                # Ignore empty lines.
                 if not line:
                     continue
 
-                # Ignore comments.
                 if line.startswith("#"):
                     continue
 
-                # Ignore malformed lines.
                 if "=" not in line:
                     continue
 
@@ -180,6 +152,7 @@ def _parse_file(path):
                 )
 
                 melimi_word = melimi_part.strip()
+
                 standard_word = standard_part.strip()
 
                 if not melimi_word:
@@ -196,7 +169,6 @@ def _parse_file(path):
                 )
 
     except OSError:
-
         pass
 
     return pairs
@@ -207,12 +179,6 @@ def _parse_file(path):
 # ============================================================
 
 def _load_all_mappings():
-    """
-    Load mappings from every language/*.txt file.
-
-    If the same standard Telugu word occurs more than once,
-    the later file wins.
-    """
 
     files = _language_files()
 
@@ -220,11 +186,9 @@ def _load_all_mappings():
 
     for file_path in files:
 
-        pairs = _parse_file(
+        for standard_word, melimi_word in _parse_file(
             file_path
-        )
-
-        for standard_word, melimi_word in pairs:
+        ):
 
             merged[standard_word] = melimi_word
 
@@ -235,14 +199,6 @@ def _load_all_mappings():
 
 
     # Longer phrases first.
-    #
-    # Example:
-    #
-    # "సహాయం చేయు"
-    #
-    # before:
-    #
-    # "సహాయం"
 
     mappings.sort(
         key=lambda pair: (
@@ -252,6 +208,7 @@ def _load_all_mappings():
         reverse=True
     )
 
+
     return mappings, files
 
 
@@ -260,14 +217,6 @@ def _load_all_mappings():
 # ============================================================
 
 def _build_knowledge_context(mappings):
-    """
-    Build a very small vocabulary sample for Groq.
-
-    IMPORTANT:
-
-    We intentionally do NOT send the entire language corpus
-    to Groq because that previously caused the 413 error.
-    """
 
     if not mappings:
         return ""
@@ -287,6 +236,7 @@ def _build_knowledge_context(mappings):
     context = "\n".join(
         lines
     )
+
 
     if len(context) > MAX_KNOWLEDGE_CONTEXT_CHARS:
 
@@ -312,17 +262,13 @@ def _build_knowledge_context(mappings):
 # ============================================================
 
 def get_mappings():
-    """
-    Return the current vocabulary mappings.
-
-    Automatically reloads the language files if they changed.
-    """
 
     files = _language_files()
 
     signature = _current_mtime_signature(
         files
     )
+
 
     with _lock:
 
@@ -345,16 +291,13 @@ def get_mappings():
                 "mtime_signature"
             ] = signature
 
+
         return _cache[
             "mappings"
         ]
 
 
 def get_knowledge_context():
-    """
-    Return the small vocabulary sample
-    intended for Groq.
-    """
 
     get_mappings()
 
@@ -366,9 +309,6 @@ def get_knowledge_context():
 
 
 def reload_now():
-    """
-    Force vocabulary reload on the next request.
-    """
 
     with _lock:
 
@@ -378,7 +318,7 @@ def reload_now():
 
 
 # ============================================================
-# PROTECTED SEGMENTS
+# PROTECTED CONTENT
 # ============================================================
 
 _PROTECT_PATTERNS = [
@@ -421,13 +361,10 @@ _PLACEHOLDER_TEMPLATE = (
 
 
 # ============================================================
-# PROTECT SEGMENTS
+# PROTECT
 # ============================================================
 
 def _protect_segments(text):
-    """
-    Protect URLs, code and file paths from vocabulary replacement.
-    """
 
     store = []
 
@@ -443,6 +380,7 @@ def _protect_segments(text):
             index
         )
 
+
     masked = text
 
     for pattern in _PROTECT_PATTERNS:
@@ -452,11 +390,12 @@ def _protect_segments(text):
             masked
         )
 
+
     return masked, store
 
 
 # ============================================================
-# RESTORE SEGMENTS
+# RESTORE
 # ============================================================
 
 def _restore_segments(
@@ -477,15 +416,12 @@ def _restore_segments(
 
 
 # ============================================================
-# WORD MATCHING
+# WORD PATTERN
 # ============================================================
 
 def _build_word_pattern(
     standard_word
 ):
-    """
-    Build a Unicode-aware whole-word pattern.
-    """
 
     escaped = re.escape(
         standard_word
@@ -505,40 +441,23 @@ def _build_word_pattern(
 def apply_melimi_replacements(
     response_text
 ):
-    """
-    Replace established standard Telugu vocabulary
-    with established Melimi Telugu vocabulary.
-
-    Only words present in language/*.txt are used.
-
-    No new words are invented here.
-    """
 
     if not response_text:
-
         return response_text
 
 
     mappings = get_mappings()
 
     if not mappings:
-
         return response_text
 
-
-    # Protect code, URLs and paths.
 
     masked_text, store = _protect_segments(
         response_text
     )
 
 
-    # Replace standard Telugu → Melimi Telugu.
-
-    for (
-        standard_word,
-        melimi_word
-    ) in mappings:
+    for standard_word, melimi_word in mappings:
 
         pattern = _build_word_pattern(
             standard_word
@@ -549,8 +468,6 @@ def apply_melimi_replacements(
             masked_text
         )
 
-
-    # Restore protected content.
 
     return _restore_segments(
         masked_text,
