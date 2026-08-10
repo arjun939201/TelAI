@@ -208,8 +208,7 @@ def replace_melimi_words(text):
 
         # Escape the vocabulary for regex
 
-        escaped =
-            re.escape(standard_word)
+        escaped = re.escape(standard_word)
 
 
         # ----------------------------------------------------
