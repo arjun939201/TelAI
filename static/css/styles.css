@@ -1,20 +1,109 @@
 :root {
-    --bg: #ffffff;
-    --sidebar: #f7f7f8;
-    --border: #e7e7e8;
-    --text: #171717;
-    --muted: #737373;
-    --subtle: #a0a0a0;
-    --accent: #111111;
-    --hover: #eeeeef;
-    --message: #f4f4f4;
-    --white: #ffffff;
+    --bg: #0b0d10;
+    --sidebar: #111418;
+    --border: #252a31;
+    --text: #f2f4f7;
+    --muted: #9aa3ad;
+    --subtle: #69727d;
+    --accent: #ffffff;
+    --hover: #1b2026;
+    --message: #1a1f25;
+    --white: #15191e;
 }
-
 * {
     box-sizing: border-box;
 }
+body {
+    background: var(--bg);
+    color: var(--text);
+}
 
+.app {
+    background: var(--bg);
+}
+
+.sidebar {
+    background: var(--sidebar);
+    border-color: var(--border);
+}
+
+.main {
+    background: var(--bg);
+}
+
+.topbar {
+    background: rgba(11, 13, 16, 0.94);
+    border-color: var(--border);
+}
+
+.new-chat-button {
+    background: #181d23;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.new-chat-button:hover {
+    background: var(--hover);
+}
+
+.chat-item.active {
+    background: #1c2229;
+    color: var(--text);
+}
+
+.suggestion {
+    background: #13181d;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.suggestion:hover {
+    background: #1b2026;
+    border-color: #353c45;
+}
+
+.suggestion span {
+    background: #20252c;
+    color: #c7cdd4;
+}
+
+.message.user .message-content {
+    background: #252b32;
+    color: #f2f4f7;
+}
+
+.message.assistant .message-content {
+    color: #e7eaee;
+}
+
+.composer-area {
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(11,13,16,0),
+            rgba(11,13,16,0.96) 18%,
+            #0b0d10 42%
+        );
+}
+
+.composer {
+    background: #151a20;
+    border-color: #30363e;
+}
+
+textarea {
+    color: #f2f4f7;
+}
+
+textarea::placeholder {
+    color: #737c86;
+}
+
+.mobile-new-chat {
+    background: #151a20;
+    border-color: var(--border);
+    color: var(--text);
+}
 html,
 body {
     margin: 0;
