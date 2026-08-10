@@ -3,11 +3,10 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from services.grok_chat import (
+from services.openai_chat import (
     generate_reply,
-    GroqRequestError,
+    OpenAIRequestError,
 )
-
 
 router = APIRouter()
 
@@ -79,7 +78,7 @@ async def chat(
             history,
         )
 
-    except GroqRequestError as exc:
+    except OpenAIRequestError as exc:
 
         raise HTTPException(
             status_code=exc.status_code,
