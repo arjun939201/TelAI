@@ -30,7 +30,27 @@
             </div>
         </div>
 
+<div class="language-explorer">
 
+    <div class="section-title">
+        LANGUAGE
+    </div>
+
+    <div class="folder-row">
+        <span>📁</span>
+        <strong>language</strong>
+    </div>
+
+    <div id="languageFiles"></div>
+
+    <button
+        id="uploadLanguageFile"
+        class="upload-button"
+    >
+        ＋ Upload file
+    </button>
+
+</div>
         <button
             id="clearButton"
             class="new-chat-button"
@@ -213,7 +233,12 @@
     </main>
 
 </div>
-
+<input
+    type="file"
+    id="languageFileInput"
+    accept=".txt,.md,.json,.csv"
+    hidden
+>
 
 <script src="/static/js/chatbot.js"></script>
 
