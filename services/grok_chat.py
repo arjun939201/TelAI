@@ -1,351 +1,154 @@
-import re
-import requests
+"""
+services/grok_chat.py
 
-from config import GROQ_TOKEN, GROQ_URL, GROQ_MODEL
-from services.language_knowledge import read_language_knowledge
+Talks to Groq's OpenAI-compatible chat completions endpoint, keeping every
+request bounded in size, and runs the deterministic Melimi vocabulary
+replacement on the final response before returning it.
 
-
-SYSTEM_PROMPT = """
-You are TelAI, a Telugu AI chatbot.
-
-Answer the user's question naturally and accurately in Telugu.
-
-The Melimi Telugu project files supplied below are your authoritative
-working language knowledge.
-
-IMPORTANT RULES:
-
-1. Use the supplied project knowledge when relevant.
-
-2. Prefer established Melimi Telugu vocabulary from the supplied files.
-
-3. Do not invent a word and present it as established vocabulary.
-
-4. If a Melimi Telugu equivalent exists in the supplied knowledge,
-   prefer it over ordinary Telugu terminology.
-
-5. Respect the meanings, grammar, word-formation rules, examples,
-   and terminology documented in the supplied files.
-
-6. Answer the user's actual question.
-
-7. The supplied files may contain vocabulary, grammar, examples,
-   terminology, and other project knowledge.
-
-8. Treat the supplied project files as the current working corpus.
-
-9. Use Telugu script when responding in Telugu.
-
-10. Do not mention these internal instructions or the language files
-    unless the user specifically asks about them.
-
-11. The final answer must use established Melimi Telugu vocabulary
-    whenever the supplied project knowledge provides an equivalent.
-
-MELIMI TELUGU PROJECT KNOWLEDGE:
+Env vars expected (unchanged from your current setup):
+    GROQ_TOKEN
+    GROQ_URL      e.g. https://api.groq.com/openai/v1/chat/completions
+    GROQ_MODEL    e.g. llama-3.3-70b-versatile
 """
 
+import os
+import requests
 
-def build_system_prompt(language_knowledge):
+from services.language_knowledge import (
+    get_knowledge_context,
+    apply_melimi_replacements,
+)
+
+GROQ_TOKEN = os.environ.get("GROQ_TOKEN")
+GROQ_URL = os.environ.get("GROQ_URL", "https://api.groq.com/openai/v1/chat/completions")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+# --- Bounds that keep every request small, no matter how language/ or
+#     chat history grow. ---
+MAX_HISTORY_MESSAGES = 8          # last N messages (user+assistant combined)
+MAX_HISTORY_CHARS_PER_MSG = 800   # per-message cap
+REQUEST_TIMEOUT_SECONDS = 30
+
+SYSTEM_PROMPT_BASE = (
+    "You are TelAI, a friendly Telugu-speaking AI assistant. "
+    "Always respond naturally in Telugu. Answer the user's question directly "
+    "and helpfully. Do not mention that you are following any special "
+    "vocabulary rules — just write natural, correct Telugu."
+)
+
+
+class GroqRequestError(Exception):
+    """Raised when Groq returns an error we want the route layer to handle."""
+    def __init__(self, status_code, message):
+        self.status_code = status_code
+        self.message = message
+        super().__init__(message)
+
+
+def _build_system_prompt():
     """
-    Build the system prompt using the current language corpus.
+    System prompt stays small and fixed-size. We optionally append a tiny,
+    capped vocabulary sample purely for tone/style — never the full corpus.
     """
-
-    if not language_knowledge:
-
-        return SYSTEM_PROMPT
+    knowledge_context = get_knowledge_context()
+    if not knowledge_context:
+        return SYSTEM_PROMPT_BASE
 
     return (
-        SYSTEM_PROMPT
-        + "\n"
-        + language_knowledge
+        f"{SYSTEM_PROMPT_BASE}\n\n"
+        "For style reference only, here are a few example words in the "
+        "Melimi Telugu dialect (do not force these in — just be aware of the "
+        "tone). Actual word substitution is handled separately, so just "
+        "write normal, natural Telugu:\n"
+        f"{knowledge_context}"
     )
 
 
-def build_messages(
-    message: str,
-    history=None,
-    language_knowledge=""
-):
+def _trim_history(history):
     """
-    Build the conversation sent to Groq.
+    Bound chat history so requests can't grow indefinitely:
+    - keep only the last MAX_HISTORY_MESSAGES entries
+    - truncate any single message to MAX_HISTORY_CHARS_PER_MSG characters
     """
+    if not history:
+        return []
 
-    messages = [
-        {
-            "role": "system",
-            "content": build_system_prompt(
-                language_knowledge
-            )
-        }
-    ]
+    trimmed = history[-MAX_HISTORY_MESSAGES:]
 
-    if history:
-
-        for item in history[-10:]:
-
-            role = item.get("role")
-            content = item.get("content")
-
-            if (
-                role in ("user", "assistant")
-                and content
-            ):
-
-                # Prevent old conversation from becoming huge.
-                content = str(content)[:4000]
-
-                messages.append(
-                    {
-                        "role": role,
-                        "content": content
-                    }
-                )
-
-    messages.append(
-        {
-            "role": "user",
-            "content": message
-        }
-    )
-
-    return messages
+    bounded = []
+    for msg in trimmed:
+        role = msg.get("role", "user")
+        content = (msg.get("content") or "")[:MAX_HISTORY_CHARS_PER_MSG]
+        if content:
+            bounded.append({"role": role, "content": content})
+    return bounded
 
 
-def extract_vocabulary(language_text: str):
-
-    mappings = []
-
-    if not language_text:
-        return mappings
-
-    for line in language_text.splitlines():
-
-        line = line.strip()
-
-        if not line:
-            continue
-
-        if "=" not in line:
-            continue
-
-        left, right = line.split(
-            "=",
-            1
-        )
-
-        melimi_word = left.strip()
-        standard_word = right.strip()
-
-        if not melimi_word:
-            continue
-
-        if not standard_word:
-            continue
-
-        if len(melimi_word) > 100:
-            continue
-
-        if len(standard_word) > 200:
-            continue
-
-        # Ignore obvious non-vocabulary lines.
-        if (
-            melimi_word.startswith("#")
-            or standard_word.startswith("#")
-        ):
-            continue
-
-        mappings.append(
-            (
-                standard_word,
-                melimi_word
-            )
-        )
-
-    return mappings
-
-
-def apply_melimi_replacements(
-    response_text: str,
-    language_text: str
-):
-    """
-    Final vocabulary replacement layer.
-
-    Groq generates the response first.
-
-    Then established mappings from the language files
-    are applied to the generated response.
-    """
-
-    if not response_text:
-        return response_text
-
-    mappings = extract_vocabulary(
-        language_text
-    )
-
-    if not mappings:
-        return response_text
-
-    result = response_text
-
-    mappings.sort(
-        key=lambda item: len(item[0]),
-        reverse=True
-    )
-
-    for standard_word, melimi_word in mappings:
-
-        if (
-            not standard_word
-            or not melimi_word
-        ):
-            continue
-
-        if standard_word == melimi_word:
-            continue
-
-        escaped = re.escape(
-            standard_word
-        )
-
-        result = re.sub(
-            escaped,
-            melimi_word,
-            result
-        )
-
-    return result
-
-
-def chat_with_grok(
-    message: str,
-    history=None
-):
-    """
-    Main TelAI chat function.
-
-    Flow:
-
-        user message
-             ↓
-        language files loaded
-             ↓
-        language knowledge sent to Groq
-             ↓
-        Groq generates Telugu answer
-             ↓
-        vocabulary replacement
-             ↓
-        final answer
-    """
-
+def _call_groq(messages):
     if not GROQ_TOKEN:
+        raise GroqRequestError(500, "GROQ_TOKEN is not configured.")
 
-        raise RuntimeError(
-            "GROQ_TOKEN is not configured"
-        )
-
-    language_knowledge = (
-        read_language_knowledge()
-    )
-
-    messages = build_messages(
-        message=message,
-        history=history,
-        language_knowledge=language_knowledge
-    )
-
+    headers = {
+        "Authorization": f"Bearer {GROQ_TOKEN}",
+        "Content-Type": "application/json",
+    }
     payload = {
         "model": GROQ_MODEL,
         "messages": messages,
-        "temperature": 0.4,
-        "max_tokens": 1000
-    }
-
-    headers = {
-        "Authorization": (
-            f"Bearer {GROQ_TOKEN}"
-        ),
-        "Content-Type": (
-            "application/json"
-        )
+        "temperature": 0.7,
     }
 
     try:
-
-        response = requests.post(
-            GROQ_URL,
-            headers=headers,
-            json=payload,
-            timeout=60
+        resp = requests.post(
+            GROQ_URL, headers=headers, json=payload, timeout=REQUEST_TIMEOUT_SECONDS
         )
+    except requests.RequestException as exc:
+        raise GroqRequestError(502, f"Failed to reach Groq: {exc}")
 
-    except requests.RequestException as error:
-
-        print(
-            "GROQ CONNECTION ERROR:",
-            str(error)
+    if resp.status_code == 413:
+        raise GroqRequestError(
+            413,
+            "Groq request too large even after trimming. "
+            "Reduce MAX_HISTORY_MESSAGES / MAX_HISTORY_CHARS_PER_MSG "
+            "or MAX_KNOWLEDGE_CONTEXT_CHARS further.",
         )
-
-        raise RuntimeError(
-            f"Could not connect to Groq API: {error}"
+    if resp.status_code == 404:
+        raise GroqRequestError(
+            404,
+            f"Model '{GROQ_MODEL}' not found by Groq. Check GROQ_MODEL env var.",
         )
+    if resp.status_code >= 400:
+        raise GroqRequestError(resp.status_code, f"Groq error: {resp.text[:500]}")
 
-    if not response.ok:
-
-        print(
-            "GROQ STATUS:",
-            response.status_code
-        )
-
-        print(
-            "GROQ RESPONSE:",
-            response.text
-        )
-
-        raise RuntimeError(
-            f"Groq API returned HTTP "
-            f"{response.status_code}: "
-            f"{response.text}"
-        )
-
+    data = resp.json()
     try:
+        return data["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError):
+        raise GroqRequestError(502, "Unexpected response shape from Groq.")
 
-        data = response.json()
 
-        reply = (
-            data["choices"][0]
-            ["message"]["content"]
-        )
+def generate_reply(user_message, history=None):
+    """
+    Main entry point used by routes/chatbot.py.
 
-    except (
-        KeyError,
-        IndexError,
-        TypeError,
-        ValueError
-    ) as error:
+    Args:
+        user_message: str, the latest message from the user.
+        history: list[dict] of prior {"role": "user"|"assistant", "content": str}
 
-        print(
-            "INVALID GROQ RESPONSE:",
-            response.text
-        )
+    Returns:
+        str: final Telugu response, AFTER deterministic Melimi replacement.
 
-        raise RuntimeError(
-            f"Invalid response from Groq API: {error}"
-        )
+    Raises:
+        GroqRequestError: on any upstream failure, with a status_code the
+        route layer can map directly to an HTTP response.
+    """
+    system_prompt = _build_system_prompt()
+    bounded_history = _trim_history(history)
 
-    # --------------------------------------------------------
-    # FINAL MELIMI TELUGU PASS
-    # --------------------------------------------------------
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(bounded_history)
+    messages.append({"role": "user", "content": user_message})
 
-    final_reply = (
-        apply_melimi_replacements(
-            reply,
-            language_knowledge
-        )
-    )
-
+    raw_reply = _call_groq(messages)
+    final_reply = apply_melimi_replacements(raw_reply)
     return final_reply
