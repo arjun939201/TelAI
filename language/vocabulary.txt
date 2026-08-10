@@ -9,6 +9,7 @@
 ముప్పు = danger / problem
 ముప్పుకాను = dangerous
 ముప్పుగారం = dangerousness
+హాళికాను = ఆసక్తికరం, ఆసక్తికరమైన
 హత్తరం = effect / impact / influence
 హత్తరకాను = effective
 హత్తరమారి = influential
