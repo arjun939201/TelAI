@@ -1,5 +1,6 @@
 import requests
 
+from services.language_knowledge import read_language_knowledge
 from config import GROQ_TOKEN, GROQ_URL, GROQ_MODEL
 
 
