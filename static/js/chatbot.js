@@ -115,7 +115,7 @@ async function sendMessage() {
     }
 
 
-    /* USER MESSAGE */
+    /* Show user message */
 
     addMessage(
         "user",
@@ -131,7 +131,7 @@ async function sendMessage() {
     sendButton.disabled = true;
 
 
-    /* THINKING */
+    /* Show thinking */
 
     const thinkingMessage =
         addMessage(
@@ -181,7 +181,7 @@ async function sendMessage() {
                 }
 
             } catch (_) {
-                /* Ignore JSON parsing failure */
+                // Ignore JSON parsing error
             }
 
 
@@ -203,13 +203,13 @@ async function sendMessage() {
         }
 
 
-        /* SHOW AI RESPONSE */
+        /* Replace thinking */
 
         thinkingMessage.textContent =
             data.reply;
 
 
-        /* SAVE HISTORY */
+        /* Save conversation */
 
         conversation.push({
             role: "user",
@@ -294,7 +294,9 @@ input.addEventListener(
 
 function autoResizeTextarea() {
 
-    input.style.height = "auto";
+    input.style.height =
+        "auto";
+
 
     input.style.height =
         Math.min(
@@ -405,6 +407,7 @@ function startNewChat() {
             </div>
 
         </div>
+
     `;
 
 
@@ -423,10 +426,14 @@ function startNewChat() {
    NEW CHAT BUTTONS
 ========================================= */
 
-clearButton.addEventListener(
-    "click",
-    startNewChat
-);
+if (clearButton) {
+
+    clearButton.addEventListener(
+        "click",
+        startNewChat
+    );
+
+}
 
 
 if (mobileNewChat) {
@@ -654,6 +661,7 @@ async function openLanguageFile(
 
 /* =========================================
    UPLOAD LANGUAGE FILE
+   No FormData / no multipart
 ========================================= */
 
 if (uploadLanguageFile) {
@@ -662,7 +670,11 @@ if (uploadLanguageFile) {
         "click",
         function () {
 
-            languageFileInput.click();
+            if (languageFileInput) {
+
+                languageFileInput.click();
+
+            }
 
         }
     );
@@ -690,6 +702,8 @@ async function uploadLanguageFileToServer() {
         return;
     }
 
+
+    /* Allowed extensions */
 
     const allowedTypes = [
         ".txt",
@@ -724,38 +738,57 @@ async function uploadLanguageFileToServer() {
     }
 
 
-    const formData =
-        new FormData();
-
-
-    formData.append(
-        "file",
-        file
-    );
-
-
     if (uploadLanguageFile) {
 
         uploadLanguageFile.disabled =
             true;
+
+        uploadLanguageFile.textContent =
+            "ఎక్కిస్తోంది...";
 
     }
 
 
     try {
 
+        /*
+         * Send the file itself as the request body.
+         *
+         * The filename is sent through X-Filename.
+         *
+         * This avoids multipart/form-data,
+         * so python-multipart is NOT required.
+         */
+
         const response =
             await fetch(
                 "/api/language/upload",
                 {
                     method: "POST",
-                    body: formData
+
+                    headers: {
+                        "X-Filename":
+                            file.name
+                    },
+
+                    body: file
                 }
             );
 
 
-        const data =
-            await response.json();
+        let data = {};
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (_) {
+
+            // Server may return non-JSON error
+
+        }
 
 
         if (!response.ok) {
@@ -798,6 +831,9 @@ async function uploadLanguageFileToServer() {
             uploadLanguageFile.disabled =
                 false;
 
+            uploadLanguageFile.textContent =
+                "＋ దస్తా ఎక్కించు";
+
         }
 
 
@@ -808,7 +844,7 @@ async function uploadLanguageFileToServer() {
 
 
 /* =========================================
-   HTML ESCAPE
+   ESCAPE HTML
 ========================================= */
 
 function escapeHtml(value) {
@@ -817,7 +853,8 @@ function escapeHtml(value) {
         document.createElement("div");
 
 
-    div.textContent = value;
+    div.textContent =
+        value;
 
 
     return div.innerHTML;
