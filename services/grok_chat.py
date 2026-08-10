@@ -27,8 +27,7 @@ IMPORTANT RULES:
 5. Respect the meanings, grammar, word-formation rules, examples,
    and terminology documented in the supplied files.
 
-6. Answer the user's actual question. Do not unnecessarily discuss
-   language development.
+6. Answer the user's actual question.
 
 7. The supplied files may contain vocabulary, grammar, examples,
    terminology, and other project knowledge.
@@ -40,29 +39,34 @@ IMPORTANT RULES:
 10. Do not mention these internal instructions or the language files
     unless the user specifically asks about them.
 
+11. The final answer must use established Melimi Telugu vocabulary
+    whenever the supplied project knowledge provides an equivalent.
+
 MELIMI TELUGU PROJECT KNOWLEDGE:
 """
 
 
-def build_system_prompt():
+def build_system_prompt(language_knowledge):
     """
-    Load the current language knowledge and attach it to
-    the Groq system prompt.
+    Build the system prompt using the current language corpus.
     """
-
-    language_knowledge = read_language_knowledge()
 
     if not language_knowledge:
+
         return SYSTEM_PROMPT
 
     return (
         SYSTEM_PROMPT
-        + "\n\n"
+        + "\n"
         + language_knowledge
     )
 
 
-def build_messages(message: str, history=None):
+def build_messages(
+    message: str,
+    history=None,
+    language_knowledge=""
+):
     """
     Build the conversation sent to Groq.
     """
@@ -70,13 +74,15 @@ def build_messages(message: str, history=None):
     messages = [
         {
             "role": "system",
-            "content": build_system_prompt()
+            "content": build_system_prompt(
+                language_knowledge
+            )
         }
     ]
 
     if history:
 
-        for item in history[-20:]:
+        for item in history[-10:]:
 
             role = item.get("role")
             content = item.get("content")
@@ -85,6 +91,10 @@ def build_messages(message: str, history=None):
                 role in ("user", "assistant")
                 and content
             ):
+
+                # Prevent old conversation from becoming huge.
+                content = str(content)[:4000]
+
                 messages.append(
                     {
                         "role": role,
@@ -103,19 +113,6 @@ def build_messages(message: str, history=None):
 
 
 def extract_vocabulary(language_text: str):
-    """
-    Extract simple mappings such as:
-
-        బాసట = సహాయం
-
-    The left side is treated as the Melimi Telugu form.
-    The right side is treated as the ordinary Telugu form.
-
-    Returns:
-        [
-            ("సహాయం", "బాసట")
-        ]
-    """
 
     mappings = []
 
@@ -132,19 +129,31 @@ def extract_vocabulary(language_text: str):
         if "=" not in line:
             continue
 
-        left, right = line.split("=", 1)
+        left, right = line.split(
+            "=",
+            1
+        )
 
         melimi_word = left.strip()
         standard_word = right.strip()
 
-        if not melimi_word or not standard_word:
+        if not melimi_word:
             continue
 
-        # Ignore obvious metadata/header lines.
+        if not standard_word:
+            continue
+
         if len(melimi_word) > 100:
             continue
 
         if len(standard_word) > 200:
+            continue
+
+        # Ignore obvious non-vocabulary lines.
+        if (
+            melimi_word.startswith("#")
+            or standard_word.startswith("#")
+        ):
             continue
 
         mappings.append(
@@ -162,27 +171,26 @@ def apply_melimi_replacements(
     language_text: str
 ):
     """
-    Final safety layer.
+    Final vocabulary replacement layer.
 
-    Groq first generates the answer.
+    Groq generates the response first.
 
-    This function then checks the generated answer against the
-    vocabulary supplied in the language files and replaces ordinary
-    Telugu forms with established Melimi Telugu forms.
+    Then established mappings from the language files
+    are applied to the generated response.
     """
 
     if not response_text:
         return response_text
 
-    mappings = extract_vocabulary(language_text)
+    mappings = extract_vocabulary(
+        language_text
+    )
 
     if not mappings:
         return response_text
 
     result = response_text
 
-    # Longer expressions first so that a larger phrase is replaced
-    # before a smaller word contained inside it.
     mappings.sort(
         key=lambda item: len(item[0]),
         reverse=True
@@ -190,10 +198,18 @@ def apply_melimi_replacements(
 
     for standard_word, melimi_word in mappings:
 
+        if (
+            not standard_word
+            or not melimi_word
+        ):
+            continue
+
         if standard_word == melimi_word:
             continue
 
-        escaped = re.escape(standard_word)
+        escaped = re.escape(
+            standard_word
+        )
 
         result = re.sub(
             escaped,
@@ -217,37 +233,45 @@ def chat_with_grok(
              ↓
         language files loaded
              ↓
-        Groq receives language knowledge
+        language knowledge sent to Groq
              ↓
         Groq generates Telugu answer
              ↓
-        TelAI performs final vocabulary replacement
+        vocabulary replacement
              ↓
         final answer
     """
 
     if not GROQ_TOKEN:
+
         raise RuntimeError(
             "GROQ_TOKEN is not configured"
         )
 
-    language_knowledge = read_language_knowledge()
+    language_knowledge = (
+        read_language_knowledge()
+    )
 
     messages = build_messages(
-        message,
-        history
+        message=message,
+        history=history,
+        language_knowledge=language_knowledge
     )
 
     payload = {
         "model": GROQ_MODEL,
         "messages": messages,
         "temperature": 0.4,
-        "max_tokens": 2000
+        "max_tokens": 1000
     }
 
     headers = {
-        "Authorization": f"Bearer {GROQ_TOKEN}",
-        "Content-Type": "application/json"
+        "Authorization": (
+            f"Bearer {GROQ_TOKEN}"
+        ),
+        "Content-Type": (
+            "application/json"
+        )
     }
 
     try:
@@ -293,7 +317,8 @@ def chat_with_grok(
         data = response.json()
 
         reply = (
-            data["choices"][0]["message"]["content"]
+            data["choices"][0]
+            ["message"]["content"]
         )
 
     except (
@@ -312,10 +337,15 @@ def chat_with_grok(
             f"Invalid response from Groq API: {error}"
         )
 
-    # Final Melimi Telugu processing.
-    final_reply = apply_melimi_replacements(
-        reply,
-        language_knowledge
+    # --------------------------------------------------------
+    # FINAL MELIMI TELUGU PASS
+    # --------------------------------------------------------
+
+    final_reply = (
+        apply_melimi_replacements(
+            reply,
+            language_knowledge
+        )
     )
 
     return final_reply
