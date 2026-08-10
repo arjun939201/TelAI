@@ -8,6 +8,10 @@ const mobileNewChat = document.getElementById("mobileNewChat");
 let conversation = [];
 
 
+/* =========================================
+   ADD MESSAGE
+========================================= */
+
 function addMessage(role, content) {
 
     const welcome = document.querySelector(".welcome");
@@ -20,9 +24,11 @@ function addMessage(role, content) {
 
     message.className = `message ${role}`;
 
-    const contentElement = document.createElement("div");
+    const contentElement =
+        document.createElement("div");
 
-    contentElement.className = "message-content";
+    contentElement.className =
+        "message-content";
 
     contentElement.textContent = content;
 
@@ -37,13 +43,23 @@ function addMessage(role, content) {
 }
 
 
+/* =========================================
+   SEND MESSAGE
+========================================= */
+
 async function sendMessage() {
 
-    const message = input.value.trim();
+    const message =
+        input.value.trim();
 
-    if (!message || sendButton.disabled) {
+    if (
+        !message ||
+        sendButton.disabled
+    ) {
         return;
     }
+
+    /* Show user message */
 
     addMessage(
         "user",
@@ -56,37 +72,54 @@ async function sendMessage() {
 
     sendButton.disabled = true;
 
-    const thinking = addMessage(
-        "assistant",
-        "ఆలోచిస్తున్నాను..."
-    );
+
+    /* Show thinking */
+
+    const thinking =
+        addMessage(
+            "assistant",
+            "ఆలోచిస్తున్నాను..."
+        );
+
 
     try {
 
-        const response = await fetch(
-            "/api/chat",
-            {
-                method: "POST",
+        const response =
+            await fetch(
+                "/api/chat",
+                {
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
-                    message: message,
-                    history: conversation
-                })
-            }
-        );
+                    body: JSON.stringify({
+                        message: message,
+                        history: conversation
+                    })
+                }
+            );
+
+
+        /* Read response */
 
         let data = {};
 
         try {
-            data = await response.json();
+
+            data =
+                await response.json();
+
         } catch (_) {
+
             data = {};
+
         }
+
+
+        /* Backend error */
 
         if (!response.ok) {
 
@@ -96,6 +129,9 @@ async function sendMessage() {
             );
         }
 
+
+        /* Missing reply */
+
         if (!data.reply) {
 
             throw new Error(
@@ -103,8 +139,14 @@ async function sendMessage() {
             );
         }
 
+
+        /* Show AI response */
+
         thinking.textContent =
             data.reply;
+
+
+        /* Save conversation */
 
         conversation.push({
             role: "user",
@@ -116,6 +158,7 @@ async function sendMessage() {
             content: data.reply
         });
 
+
     } catch (error) {
 
         console.error(
@@ -123,12 +166,21 @@ async function sendMessage() {
             error
         );
 
+
+        /*
+         * IMPORTANT:
+         * Show the real backend error.
+         * Do not hide it behind a generic message.
+         */
+
         thinking.textContent =
-            "క్షమించు. సమాధానం ఇవ్వడంలో సమస్య వచ్చింది.";
+            `లోపం: ${error.message}`;
+
 
     } finally {
 
-        sendButton.disabled = false;
+        sendButton.disabled =
+            false;
 
         input.focus();
 
@@ -138,13 +190,63 @@ async function sendMessage() {
 }
 
 
+/* =========================================
+   FORM SUBMIT
+========================================= */
+
+if (form) {
+
+    form.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+    );
+}
+
+
+/* =========================================
+   ENTER TO SEND
+========================================= */
+
+if (input) {
+
+    input.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+
+        }
+    );
+}
+
+
+/* =========================================
+   AUTO RESIZE TEXTAREA
+========================================= */
+
 function autoResizeTextarea() {
 
     if (!input) {
         return;
     }
 
-    input.style.height = "auto";
+    input.style.height =
+        "auto";
 
     input.style.height =
         Math.min(
@@ -153,6 +255,113 @@ function autoResizeTextarea() {
         ) + "px";
 }
 
+
+if (input) {
+
+    input.addEventListener(
+        "input",
+        autoResizeTextarea
+    );
+}
+
+
+/* =========================================
+   WELCOME SCREEN
+========================================= */
+
+function getWelcomeHTML() {
+
+    return `
+
+        <div class="welcome">
+
+            <div class="welcome-icon">
+                T
+            </div>
+
+            <h1>
+                ఏమి తెలుసుకొనగోరుతున్నావు?
+            </h1>
+
+            <p>
+                తెలుగులో ఏదైనా అడుగు.
+                మేలిమి తెలుగు పదాలు,
+                వ్యాకరణం, పదనిర్మాణం
+                లేదా ఏదైనా విషయాన్ని అడవచ్చు.
+            </p>
+
+            <div class="suggestions">
+
+                <button
+                    class="suggestion"
+                    data-message="మేలిమి తెలుగు అంటే ఏమిటి?"
+                    type="button"
+                >
+
+                    <span>
+                        ◈
+                    </span>
+
+                    మేలిమి తెలుగు అంటే ఏమిటి?
+
+                </button>
+
+
+                <button
+                    class="suggestion"
+                    data-message="హత్తరం అంటే ఏమిటి?"
+                    type="button"
+                >
+
+                    <span>
+                        ◇
+                    </span>
+
+                    పదం అర్థం అడుగు
+
+                </button>
+
+
+                <button
+                    class="suggestion"
+                    data-message="ఒక కొత్త మేలిమి తెలుగు పదాన్ని సూచించు."
+                    type="button"
+                >
+
+                    <span>
+                        ✦
+                    </span>
+
+                    కొత్త పదం సూచించు
+
+                </button>
+
+
+                <button
+                    class="suggestion"
+                    data-message="మేలిమి తెలుగు పదనిర్మాణ నియమాలను వివరించు."
+                    type="button"
+                >
+
+                    <span>
+                        ⌘
+                    </span>
+
+                    పదనిర్మాణం నేర్చుకో
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+/* =========================================
+   NEW CHAT
+========================================= */
 
 function startNewChat() {
 
@@ -171,130 +380,9 @@ function startNewChat() {
 }
 
 
-function getWelcomeHTML() {
-
-    return `
-        <div class="welcome">
-
-            <div class="welcome-icon">
-                T
-            </div>
-
-            <h1>
-                ఏమి తెలుసుకొనగోరుతున్నావు?
-            </h1>
-
-            <p>
-                తెలుగులో ఏదైనా అడుగు.
-                మేలిమి తెలుగు పదాలు,
-                వ్యాకరణం, పదనిర్మాణం
-                లేదా ఏదైనా విషయాన్ని అడగవచ్చు.
-            </p>
-
-            <div class="suggestions">
-
-                <button
-                    class="suggestion"
-                    data-message="మేలిమి తెలుగు అంటే ఏమిటి?"
-                    type="button"
-                >
-                    <span>◈</span>
-                    మేలిమి తెలుగు అంటే ఏమిటి?
-                </button>
-
-                <button
-                    class="suggestion"
-                    data-message="హత్తరం అనే పదానికి అర్థం ఏమిటి?"
-                    type="button"
-                >
-                    <span>◇</span>
-                    పదం అర్థం అడుగు
-                </button>
-
-                <button
-                    class="suggestion"
-                    data-message="ఒక కొత్త మేలిమి తెలుగు పదాన్ని సూచించు."
-                    type="button"
-                >
-                    <span>✦</span>
-                    కొత్త పదం సూచించు
-                </button>
-
-                <button
-                    class="suggestion"
-                    data-message="మేలిమి తెలుగు పదనిర్మాణ నియమాలను వివరించు."
-                    type="button"
-                >
-                    <span>⌘</span>
-                    పదనిర్మాణం నేర్చుకో
-                </button>
-
-            </div>
-        </div>
-    `;
-}
-
-
-function attachSuggestionEvents() {
-
-    document
-        .querySelectorAll(".suggestion")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    input.value =
-                        this.dataset.message;
-
-                    autoResizeTextarea();
-
-                    input.focus();
-                }
-            );
-        });
-}
-
-
-if (form) {
-
-    form.addEventListener(
-        "submit",
-        event => {
-
-            event.preventDefault();
-
-            sendMessage();
-        }
-    );
-}
-
-
-if (input) {
-
-    input.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-                sendMessage();
-            }
-        }
-    );
-
-    input.addEventListener(
-        "input",
-        autoResizeTextarea
-    );
-}
-
+/* =========================================
+   NEW CHAT BUTTON
+========================================= */
 
 if (clearButton) {
 
@@ -313,6 +401,40 @@ if (mobileNewChat) {
     );
 }
 
+
+/* =========================================
+   SUGGESTIONS
+========================================= */
+
+function attachSuggestionEvents() {
+
+    document
+        .querySelectorAll(".suggestion")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        input.value =
+                            this.dataset.message;
+
+                        autoResizeTextarea();
+
+                        input.focus();
+
+                    }
+                );
+
+            }
+        );
+}
+
+
+/* =========================================
+   INITIALIZE
+========================================= */
 
 attachSuggestionEvents();
 
