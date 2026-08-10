@@ -1,6 +1,6 @@
 fastapi
-uvicorn[standard]
-jinja2
-python-multipart
+uvicorn
 requests
 python-dotenv
+jinja2
+python-multipart'
