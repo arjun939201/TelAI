@@ -6,7 +6,343 @@ Loads Melimi Telugu vocabulary mappings from language/*.txt files.
 File format:
 
     బాసట = సహాయం
+from pathlib import Path
+import re
+import threading
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+LANGUAGE_DIR = BASE_DIR / "language"
+
+MAX_CONTEXT_CHARS = 7000
+MAX_HISTORY_CHARS = 6000
+
+_lock = threading.Lock()
+
+_cache = {
+    "signature": None,
+    "vocabulary": [],
+    "grammar": "",
+    "basic_grammar": "",
+    "replacements": [],
+    "suggestions": "",
+}
+
+
+def _read_file(filename):
+    path = LANGUAGE_DIR / filename
+
+    if not path.exists() or not path.is_file():
+        return ""
+
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+
+
+def _parse_mappings(text):
+    result = []
+
+    for line in text.splitlines():
+        line = line.strip()
+
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        left, right = line.split("=", 1)
+
+        left = left.strip()
+        right = right.strip()
+
+        if left and right:
+            result.append((left, right))
+
+    return result
+
+
+def _signature():
+    files = [
+        LANGUAGE_DIR / "vocabulary.txt",
+        LANGUAGE_DIR / "grammar.txt",
+        LANGUAGE_DIR / "basic-grammar.txt",
+        LANGUAGE_DIR / "replacements.txt",
+        LANGUAGE_DIR / "suggestions.txt",
+    ]
+
+    result = []
+
+    for path in files:
+        try:
+            stat = path.stat()
+            result.append((str(path), stat.st_mtime_ns, stat.st_size))
+        except OSError:
+            result.append((str(path), 0, 0))
+
+    return tuple(result)
+
+
+def _load():
+    vocabulary_text = _read_file("vocabulary.txt")
+    grammar_text = _read_file("grammar.txt")
+    basic_grammar_text = _read_file("basic-grammar.txt")
+    replacements_text = _read_file("replacements.txt")
+    suggestions_text = _read_file("suggestions.txt")
+
+    _cache["vocabulary"] = _parse_mappings(vocabulary_text)
+    _cache["grammar"] = grammar_text
+    _cache["basic_grammar"] = basic_grammar_text
+    _cache["replacements"] = _parse_mappings(replacements_text)
+    _cache["suggestions"] = suggestions_text
+
+
+def _ensure_loaded():
+    signature = _signature()
+
+    with _lock:
+        if _cache["signature"] != signature:
+            _load()
+            _cache["signature"] = signature
+
+
+def get_vocabulary():
+    _ensure_loaded()
+    return list(_cache["vocabulary"])
+
+
+def get_replacements():
+    _ensure_loaded()
+    return list(_cache["replacements"])
+
+
+def get_grammar():
+    _ensure_loaded()
+    return _cache["grammar"]
+
+
+def get_basic_grammar():
+    _ensure_loaded()
+    return _cache["basic_grammar"]
+
+
+def _keywords(text):
+    words = re.findall(r"[\u0C00-\u0C7F]+", text or "")
+    return {word for word in words if len(word) >= 2}
+
+
+def _score_line(line, keywords):
+    if not keywords:
+        return 0
+
+    score = 0
+
+    for word in keywords:
+        if word in line:
+            score += 1
+
+    return score
+
+
+def _relevant_lines(text, query, limit=80):
+    if not text:
+        return []
+
+    keywords = _keywords(query)
+
+    lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip()
+        and not line.strip().startswith("#")
+    ]
+
+    if not keywords:
+        return lines[:limit]
+
+    scored = []
+
+    for index, line in enumerate(lines):
+        score = _score_line(line, keywords)
+
+        if score:
+            scored.append((score, index, line))
+
+    scored.sort(
+        key=lambda item: (item[0], -item[1]),
+        reverse=True,
+    )
+
+    selected = [item[2] for item in scored[:limit]]
+
+    if len(selected) < limit:
+        for line in lines:
+            if line not in selected:
+                selected.append(line)
+
+            if len(selected) >= limit:
+                break
+
+    return selected[:limit]
+
+
+def _relevant_vocabulary(query, limit=80):
+    vocabulary = get_vocabulary()
+    replacements = get_replacements()
+
+    combined = vocabulary + replacements
+
+    keywords = _keywords(query)
+
+    if not keywords:
+        return combined[:limit]
+
+    scored = []
+
+    for index, (melimi, meaning) in enumerate(combined):
+        score = 0
+
+        for keyword in keywords:
+            if keyword in melimi or keyword in meaning:
+                score += 1
+
+        if score:
+            scored.append((score, index, melimi, meaning))
+
+    scored.sort(
+        key=lambda item: (item[0], -item[1]),
+        reverse=True,
+    )
+
+    result = [
+        (item[2], item[3])
+        for item in scored[:limit]
+    ]
+
+    if len(result) < limit:
+        for item in combined:
+            if item not in result:
+                result.append(item)
+
+            if len(result) >= limit:
+                break
+
+    return result[:limit]
+
+
+def get_relevant_knowledge(query):
+    _ensure_loaded()
+
+    vocabulary = _relevant_vocabulary(query, 80)
+    grammar = _relevant_lines(
+        _cache["grammar"],
+        query,
+        45,
+    )
+    basic_grammar = _relevant_lines(
+        _cache["basic_grammar"],
+        query,
+        30,
+    )
+
+    parts = []
+
+    if vocabulary:
+        parts.append("APPROVED MELIMI VOCABULARY:")
+
+        for melimi, meaning in vocabulary:
+            parts.append(f"{melimi} = {meaning}")
+
+    if grammar:
+        parts.append("")
+        parts.append("MELIMI GRAMMAR RULES:")
+        parts.extend(grammar)
+
+    if basic_grammar:
+        parts.append("")
+        parts.append("BASIC MELIMI GRAMMAR:")
+        parts.extend(basic_grammar)
+
+    context = "\n".join(parts)
+
+    if len(context) > MAX_CONTEXT_CHARS:
+        context = context[:MAX_CONTEXT_CHARS]
+
+        last_break = context.rfind("\n")
+
+        if last_break > 0:
+            context = context[:last_break]
+
+    return context
+
+
+_PROTECT_PATTERNS = [
+    re.compile(r"```.*?```", re.DOTALL),
+    re.compile(r"`[^`\n]+`"),
+    re.compile(r"https?://\S+"),
+    re.compile(r"www\.\S+"),
+]
+
+
+def _protect(text):
+    stored = []
+
+    def replace(match):
+        index = len(stored)
+        stored.append(match.group(0))
+        return f"\x00TELAI_PROTECTED_{index}\x00"
+
+    result = text
+
+    for pattern in _PROTECT_PATTERNS:
+        result = pattern.sub(replace, result)
+
+    return result, stored
+
+
+def _restore(text, stored):
+    for index, value in enumerate(stored):
+        text = text.replace(
+            f"\x00TELAI_PROTECTED_{index}\x00",
+            value,
+        )
+
+    return text
+
+
+def _word_pattern(word):
+    return re.compile(
+        r"(?<![\u0C00-\u0C7F\w])"
+        + re.escape(word)
+        + r"(?![\u0C00-\u0C7F\w])"
+    )
+
+
+def apply_melimi_replacements(text):
+    if not text:
+        return text
+
+    replacements = get_replacements()
+
+    if not replacements:
+        return text
+
+    masked, stored = _protect(text)
+
+    replacements = sorted(
+        replacements,
+        key=lambda item: len(item[1]),
+        reverse=True,
+    )
+
+    for melimi, standard in replacements:
+        pattern = _word_pattern(standard)
+        masked = pattern.sub(melimi, masked)
+
+    return _restore(masked, stored)
+
+
+def reload_now():
+    with _lock:
+        _cache["signature"] = None
 Meaning:
 
     Melimi word = standard Telugu word
