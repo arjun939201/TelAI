@@ -26,15 +26,10 @@ ALLOWED_EXTENSIONS = {
 # KNOWLEDGE LIMIT
 # ============================================================
 
-# Prevent the complete language corpus from becoming so large
-# that the Groq request is rejected.
-#
-# This is a CHARACTER limit, not a token limit.
-#
-# 100,000 characters is roughly tens of thousands of tokens,
-# depending on the language and content.
+# Telugu text can consume many model tokens.
+# Keep the corpus sent to Groq reasonably small.
 
-MAX_KNOWLEDGE_CHARACTERS = 100_000
+MAX_KNOWLEDGE_CHARACTERS = 25_000
 
 
 # ============================================================
@@ -91,12 +86,12 @@ def read_language_knowledge():
 
     total_characters = 0
 
+    files = sorted(
+        LANGUAGE_DIR.iterdir(),
+        key=lambda item: item.name.lower()
+    )
 
-    # --------------------------------------------------------
-    # Read files in stable alphabetical order.
-    # --------------------------------------------------------
-
-    for file in sorted(LANGUAGE_DIR.iterdir()):
+    for file in files:
 
         if not file.is_file():
             continue
@@ -104,28 +99,20 @@ def read_language_knowledge():
         if file.suffix.lower() not in ALLOWED_EXTENSIONS:
             continue
 
-
         content = read_file(file).strip()
 
         if not content:
             continue
-
 
         section = (
             f"\n--- {file.name} ---\n"
             f"{content}\n"
         )
 
-
-        # ----------------------------------------------------
-        # Check knowledge-size limit.
-        # ----------------------------------------------------
-
         remaining = (
             MAX_KNOWLEDGE_CHARACTERS
             - total_characters
         )
-
 
         if remaining <= 0:
 
@@ -135,11 +122,6 @@ def read_language_knowledge():
 
             break
 
-
-        # ----------------------------------------------------
-        # Entire file fits.
-        # ----------------------------------------------------
-
         if len(section) <= remaining:
 
             sections.append(section)
@@ -147,13 +129,6 @@ def read_language_knowledge():
             total_characters += len(section)
 
             continue
-
-
-        # ----------------------------------------------------
-        # File is too large to fit completely.
-        #
-        # Include only the remaining amount.
-        # ----------------------------------------------------
 
         truncated = section[:remaining]
 
@@ -170,9 +145,7 @@ def read_language_knowledge():
 
         break
 
-
     knowledge = "\n".join(sections)
-
 
     print(
         "LANGUAGE KNOWLEDGE FILES:",
@@ -183,7 +156,6 @@ def read_language_knowledge():
         "LANGUAGE KNOWLEDGE CHARACTERS:",
         len(knowledge)
     )
-
 
     return knowledge
 
@@ -199,12 +171,10 @@ def append_suggestion(text: str):
         exist_ok=True
     )
 
-
     file_path = (
         LANGUAGE_DIR
         / "suggestions.txt"
     )
-
 
     with file_path.open(
         "a",
