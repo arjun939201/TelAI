@@ -20,11 +20,12 @@ async def chat(request: ChatRequest):
             "reply": "Please enter a message."
         }
 
-    reply = chat_with_grok(
-        request.message,
-        request.history
-    )
+   reply = chat_with_grok(
+    request.message,
+    request.history
+)
 
+reply = apply_melimi_replacements(reply)
     return {
         "reply": reply
     }
