@@ -1,0 +1,1054 @@
+మేలిమి తెలుగు — MASTER CORPUS
+================================
+
+PURPOSE
+-------
+This is a consolidated plain-text corpus for use as additional AI knowledge/context for Melimi Telugu.
+
+SOURCE BASELINE
+---------------
+“బంగారు నాణేలు” 1st edition is the foundational historical source identified by the user. It is the first book introducing Melimi Telugu as a native-Telugu-based register.
+
+IMPORTANT CORPUS RULE
+---------------------
+Preserve user-supplied Melimi Telugu spellings, meanings, examples, and distinctions. Do not silently normalize them to Standard Telugu. Later additions should be distinguished from the 1st-edition historical baseline rather than overwriting it.
+
+
+
+
+===== ORIGINAL TRANSFER FILE: melimi_telugu_project_transfer/MELIMI_TELUGU_PROJECT_TRANSFER.md =====
+
+# Melimi Telugu Project — Transfer Notes
+
+## Purpose
+
+The project is to develop a Telugu language AI system focused on **మెలిమి తెలుగు (Melimi Telugu)**: Telugu developed/expressed primarily from its own linguistic base and resources.
+
+The user distinguishes this from **మిశ్రమ తెలుగు (Mixed Telugu)**: contemporary Telugu containing substantial loan vocabulary from Sanskrit, English, Urdu, Hindi, and other languages.
+
+The intended system is not merely a "pure Telugu chatbot". It is a computational Telugu language-development / register engine that can:
+- understand Melimi Telugu
+- generate Melimi Telugu
+- distinguish Melimi Telugu and Mixed Telugu
+- develop modern terminology using Telugu resources
+- validate vocabulary and grammar
+- convert Mixed Telugu toward Melimi Telugu
+- eventually support chatbot, writing, translation, terminology, grammar-checking and research applications
+
+## Technology
+
+- Python
+- FastAPI
+- Groq API for LLM inference
+- PostgreSQL
+- pgvector initially for vector/RAG functionality
+- GitHub
+- GitHub Actions
+- Render
+- Docker
+- pytest
+
+The Groq API token is already stored in Render environment variables.
+
+Suggested environment variables:
+- GROQ_API_KEY
+- GROQ_MODEL
+- DATABASE_URL
+
+The Groq integration should be isolated behind an LLM abstraction so the linguistic engine is not tightly coupled to Groq.
+
+## Architectural principle
+
+The user's Melimi Telugu corpus and linguistic rules are the authority. Groq is the generation engine, not the linguistic authority.
+
+Conceptual flow:
+
+User
+ -> FastAPI
+ -> Telugu Register / Language Engine
+ -> vocabulary + grammar + terminology + RAG
+ -> prompt builder
+ -> Groq
+ -> Telugu validator
+ -> correction if needed
+ -> response
+
+The system should not simply put all notes into a prompt and hope the model remembers them.
+
+## Suggested repository
+
+melimi-telugu-engine/
+
+app/
+  api/
+  core/
+  llm/
+    base.py
+    groq.py
+  language/
+    telugu/
+      lexicon/
+      morphology/
+      syntax/
+      semantics/
+      derivation/
+      terminology/
+      etymology/
+      register/
+  register/
+  retrieval/
+  validation/
+  terminology/
+  generation/
+  db/
+
+knowledge/
+  raw/
+  normalized/
+  vocabulary/
+  roots/
+  grammar/
+  morphology/
+  word_formation/
+  terminology/
+  etymology/
+  examples/
+
+evaluation/
+  vocabulary/
+  grammar/
+  terminology/
+  generation/
+
+research/
+  experiments/
+  candidate_terms/
+  analyses/
+
+scripts/
+tests/
+docs/
+.github/workflows/
+Dockerfile
+docker-compose.yml
+pyproject.toml
+.env.example
+.gitignore
+README.md
+
+## Knowledge model principles
+
+Do not treat the knowledge base as only "Mixed word -> Melimi word".
+
+Important categories include:
+- native vocabulary
+- native-derived vocabulary
+- established loans
+- acceptable loans
+- discouraged loans
+- unnecessary loans
+- register-specific exclusions
+- roots
+- derivational patterns
+- compounds
+- grammar rules
+- terminology
+- semantic relationships
+- examples
+- etymology
+- source/provenance
+
+Potential vocabulary statuses:
+- PREFERRED
+- RECOMMENDED
+- ACCEPTABLE
+- NEUTRAL
+- DISCOURAGED
+- FORBIDDEN
+
+Important metadata:
+- source
+- confidence
+- register
+- domain
+- status
+- root
+- derivation
+- examples
+- preferred alternative
+
+Important distinction:
+- FACT
+- OBSERVATION
+- PREFERENCE
+- NORMATIVE RULE
+- PROPOSED RULE
+- EXPERIMENTAL TERM
+- EXCEPTION
+
+Do not silently turn an author's claim into an established linguistic fact.
+
+## Registers
+
+The project should model registers separately from the language itself.
+
+Potential registers:
+- Melimi Telugu
+- Mixed Telugu
+- formal
+- literary
+- conversational
+- academic
+- technical
+- Telugu-first modern register
+
+Melimi Telugu should not be defined merely as "remove every non-Telugu word". The intended goal is to expand Telugu's ability to express modern concepts from its own linguistic resources while maintaining intelligibility, naturalness, continuity, grammatical integrity, and productive word formation.
+
+## Terminology development
+
+A central feature should eventually be a terminology-development engine.
+
+Conceptual flow:
+
+new concept
+ -> semantic decomposition
+ -> find Telugu concepts/roots
+ -> apply Telugu derivational and compound patterns
+ -> generate candidate terms
+ -> validate meaning/grammar/naturalness
+ -> rank candidates
+ -> human/linguistic evaluation
+ -> approved terminology enters knowledge base
+
+Potential terminology laboratory API:
+POST /api/v1/terminology
+
+The system should support human approval/rejection of candidate terminology.
+
+## Evaluation
+
+A validator/evaluator should score generated output for:
+- native vocabulary use
+- native-derived terminology
+- grammar conformity
+- register conformity
+- unnecessary borrowing
+- code switching
+- semantic correctness
+- naturalness
+
+Do not invent a final scoring formula before the linguistic specification is established.
+
+## Raw Melimi Telugu examples supplied by user
+
+### Example 1 — Birthday wishes
+
+పుట్టిన్నాటి మేలెంపులు!
+
+మీ మనిమి నెమ్మనమారిగా గడుస్తూ మీరు బాసటమారి వేదారుల నడుమ నడుస్తూ మీ మలుపులు కొత్త తలుపులు తెరుస్తూ ఎల్లప్పుడూ రహి-ససిగా నిలిచి ఉండాలని కోరుకుంటున్నాను
+
+User glosses:
+- పుట్టిన్నాటి మేలెంపులు = జన్మదిన శుభాకాంక్షలు
+- మనిమి = జీవనం
+- నెమ్మనమారి = peaceful
+- బాసటమారి = helpful
+- వేదారు = వ్యక్తి
+- రహి-ససిగా = ఆనందంగా ఆరోగ్యంగా
+
+Important handling:
+- Preserve the original text exactly.
+- Do not automatically normalize spelling.
+- Record glosses as user-provided mappings.
+- Do not assume the internal morphology of these words until supported by more notes.
+- The complete passage is valuable as a style/register example.
+
+### Example 2 — Science / technical passage
+
+వెలుఁగు రెంచల కన్నులకు ఒక తాఁజూడలవి మెఱుం-సూదంటు చెదిరిక. ఉనిదిలో పలుపలు వెలుగు విన్నరాలు ఉన్నాయి. మన నేలపైటి ఐకలికి నెసరే వంచ వెలుగు వనరు. తరుకారులలో తొలిరెంచలు నిప్పుపుట్టించి వెలుగుగారం నేర్చుకున్నారు. ఇందీవలి ఏలివెలుగు పుట్టుక బిసెఱిమి ఒలవుకు వెలుగు ఊతమిచ్చి ఒక తొల్తాప అక్కఱగా అంతలకు ప్రాకింది.
+
+User glosses:
+- రెంచ = మనిషి
+- తాఁజూచు = perceive
+- తాఁజూడలవి = perceivable
+- మెఱుం = electricity
+- సూదంటు = magnet
+- చెదిరిక = radiation
+- మెఱుం-సూదంటు చెదిరిక = electromagnetic radiation
+- ఎలారము = విశ్వము
+- విన్నరము = గ్రహం
+- నెసరు = సూర్యుడు
+- వెలుగు-వనరు = light source
+- వంచ వెలుగు వనరు = primary source of light
+- తరుకారు = తరువాత కాలం
+- తొలిరెంచలు = ఆదిమానవులు
+- ఏలివెలుగు పుట్టుక బిసెర్మి = artificial light producing technology
+- వరవవి = service
+- తొల్తాప అక్కఱ = basic need
+
+Important handling:
+- Preserve the supplied passage exactly.
+- Do not normalize orthography yet.
+- Note that the passage contains "బిసెఱిమి" while the supplied gloss says "బిసెర్మి"; preserve both as supplied until clarified.
+- The examples suggest a productive terminology/compound system, but the underlying rules must be inferred from more corpus material rather than invented.
+- Examples such as మెఱుం-సూదంటు చెదిరిక and వెలుగు-వనరు are useful for studying compound formation.
+
+## Quora sources
+
+User provided a Quora Space:
+https://melimi-telugu-matalu.quora.com/
+
+Invitation link originally shared:
+https://melimi-telugu-matalu.quora.com/?invite_code=zYYixn7Qt1HzBxIyUCdJ
+
+Individual post links:
+https://melimi-telugu-matalu.quora.com/నా-ౙగల-హాళికాను-అనుపలు-My-space-interesting-posts
+https://melimi-telugu-matalu.quora.com/%E0%B0%A8%E0%B0%BE-%E0%B1%99%E0%B0%97%E0%B0%B2-%E0%B0%B9%E0%B0%BE%E0%B0%B3%E0%B0%BF%E0%B0%95%E0%B0%BE%E0%B0%A8%E0%B1%81-%E0%B0%85%E0%B0%A8%E0%B1%81%E0%B0%AA%E0%B0%B2%E0%B1%81-My-space-interesting-posts?ch=15&oid=253740954&share=1c9f3e90&srid=h076GZ&target_type=post
+
+The two individual URLs appear to refer to the same post, with the second being a share/tracking URL.
+
+The assistant has NOT retrieved or verified the Quora contents in this conversation. Do not claim to have read the Quora post contents unless they are later supplied/retrieved successfully.
+
+Recommended source-handling:
+- Preserve source URLs/provenance.
+- Do not treat Quora claims automatically as established linguistic facts.
+- Separate observations, claims, proposals, rules, and examples.
+- Do not put private invitation URLs into a public GitHub repository.
+
+## Current plan
+
+The user will provide many more Melimi Telugu examples/content.
+
+Do NOT prematurely generate the final GitHub repository.
+
+First:
+1. Collect raw Melimi Telugu material.
+2. Extract vocabulary, grammar, morphology, word formation, terminology, etymology, register, semantic patterns and examples.
+3. Build a Melimi Telugu Language Specification v0.1.
+4. Design the knowledge schema around the actual corpus.
+5. Design RAG/structured knowledge architecture.
+6. Design the validator and terminology generator.
+7. Then generate the GitHub-ready repository ZIP.
+8. Deploy with Groq + FastAPI on Render.
+
+The user wants to continue the project in a non-temporary/live chat, so this file is a transfer record.
+
+## Important working rule
+
+The user explicitly wants to provide many raw examples. Do not require them to clean or categorize the material first. Preserve source material and progressively extract structure.
+
+
+
+
+
+===== ORIGINAL TRANSFER FILE: melimi_telugu_project_transfer/README.md =====
+
+# Melimi Telugu Project Transfer
+
+This ZIP contains a transfer summary of the Melimi Telugu project discussion so far.
+
+Start with `MELIMI_TELUGU_PROJECT_TRANSFER.md`.
+
+The file contains:
+- project goal and terminology
+- architecture decisions
+- proposed repository structure
+- knowledge-model principles
+- the Melimi Telugu examples supplied so far
+- Quora source URLs
+- current development plan
+- important handling/provenance rules
+
+Continue adding the user's raw Melimi Telugu material in the new live chat. The final repository should be generated only after enough corpus material has been collected and a Melimi Telugu Language Specification v0.1 has been established.
+
+
+
+
+===== RECENT MELIMI TELUGU CORPUS ADDITIONS =====
+
+
+# మేలిమి తెలుగు — Recent Corpus Additions
+
+This file contains the Melimi Telugu material added after the original temporary-chat transfer package.
+
+## 1. ఒలవులోనే పొడవాటి ఎడమాలు త్రోవ
+
+ఒలవులోనే పొడవాటి ఎడమాలు త్రోవ
+ఈ ఆఁకలేని త్రోవలో ఏ కడలిని తాకకనే త్రుంకాలు దాటవచ్చు. ఇది ఒలవంతటి తెర్లవానులకు హాళికాను ఎడాటమైనది. ఈ త్రోవ మొత్తము 17000 కిలోమీటర్ల కెడవులది. ఒకే దారిలో త్రుంకాలు దాటుతూ తెర్లతఱిలో ఐకలి మార్పులు నమ్మరిదిగా ఉంటాయి. ఒలవంత తెర్లము చేసినట్టు ఉంటుంది.
+ఒకే తెర్లములో తీరొక్క నుళ్ళు, అలజందాలు, కరోలీలు, మనికీలు ఎదురవ్వడం ఈ దారి ఎడాపకము. ఈ దారిలో ఎడమాలుగా నడిపితే, వడ్డారం 200 లుడువుల తఱిలోనే చివరకు చేరవచ్చు. పడమటి యూరోప్ వటారుల నుండి రష్యా వెడంద బైళ్లు, మంగోలియా పేర్బైలు, చైనా వటారులు, ఆగ్నేయ ఆసియా కానల వరకు నేలపైనే పెక్కు రేయిబవులు మారుతూ తెర్లము కొనసాగుతుంది.
+
+Glosses:
+- ఒలవులోనే పొడవాటి = world's longest
+- ఎడమాలు = continuous
+- త్రోవ = road
+- ఆఁకలేని = non-stop
+- కడలి = ocean
+- త్రుంకాలు = continents
+- తెరలం/తెర్లం = ప్రయాణం
+- కెడవు = distance
+- హాళికాను ఎడాటం = interesting matter
+- ఐకలి = nature
+- నమ్మరిది = unbelievable
+- తీరొక్క = రకరకాల
+- నుళ్ళు = భాషలు
+- అలజందాలు = సంస్కృతులు
+- కరోలీలు = వాతావరణం
+- మనికీలు = జీవులు
+- వడ్డారం = కేవలం
+- లుడువులు = గంటలు
+- తఱి = సమయం
+- ఒలవంతటి = దేశవ్యాప్తమైన
+- తెర్లవాను = traveller
+
+## 2. బాహుబలి గురించి మేలిమి తెలుగులో
+
+ప్రంగాణియ తెఱాట జరిమిలో తొలి వేయిరేపాలు గడించినది మన తెలుగు తెఱాటం బాహుబలి. క్రేగానులు పెద్దకలలు కనేందుకు తేకువైంది. పెద్ద ఆస్కారాలకు త్రోవకట్టింది. అలజందపు మిహికం చూపింది. తెలుగు గుర్తింపును చాటిచెప్పింది. పొన్నాప ఱిచ్చకంగా నిలిచిపోయింది. లాసీమలలో మన సీమకి ఒక అడుగు ఎక్కువ గుర్తింపు తీసుకొచ్చింది.
+
+Glosses:
+- ప్రంగాణియం = భారత దేశం
+- ప్రంగాణియ = భారతీయ
+- తెఱాట జరిమి = సినిమా చరిత్ర
+- వేయిరేపాలు = వేయి కోట్లు
+- గడించింది = సంపాదించింది
+- క్రేగానులు = directors
+- తేకువ = ధైర్యం
+- ఆస్కారాలు = అవకాశాలు
+- అలజందం = సంస్కృతి
+- మిహికం = Greatness
+- పొన్నాప ఱిచ్చకం = visual wonder
+- లాసీమలు = విదేశాలు
+- పేరిమి = గౌరవం
+
+## 3. వలకట్టు మాటోలి — Network vocabulary
+
+- వలకట్టు = network
+- తమూవల వలకట్టు = Internet network
+- తమూవల తగులింపు = Internet connection
+- వలకట్టు నెప్పరం = Network speed
+- వలకట్టు మిసుకులు = Network signals
+- వలకట్టు త్రోవ = Network route
+- వలకట్టు నటారం = Network hub
+
+## 4. పని / తెలివి / తలపోజ / మంచిమెలన / నికవల్కరం
+
+పనిమారి తఱి ఆస్కారకాను
+అపాతెలివిప్రోది తనువెల్పనకాను
+నిలవలంతితనం పెంపుకాను
+సరితలపోజరం గెలుపుకాను
+మంచిమెలన ఎలపేర్మికాను
+నికవల్కరం మేలుకాను
+
+Glosses:
+- పనిమారి తఱి = కార్యశీలతతో గడిపే సమయం
+- ఆస్కారముకాను = అవకాశం సృష్టించేది
+- అపాతెలివిప్రోది = నిత్యజ్ఞానపోషణం
+- తనువెల్పనకాను = ఆత్మశుద్ధి చేసే పని
+- సరితలపోజరం = సరైన ఆలోచన విధానం పాటించడం
+- గెలుపుకాను = గెలుపు అందించేది
+- నిలవలంతికం = స్థితప్రజ్ఞత
+- మంచిమెలన = మంచి నడవడి
+- ఎలపేర్మికాను = విశ్వమంతా గౌరవం చేకూర్చేది
+- నికవల్కరం = సత్యం మాట్లాడటం
+- మేలుకాను = శుభకరం
+
+## 5. చదువు గురించి 5–6 బారులు
+
+మేలిమి తెలుగు:
+ఒలవును మార్చుటకు చదువు అనేది కడు బ్రోంవాను కైదువు. ఇది వేదార ఎదుగుదలకు ప్రెంపుదలకు అక్కఱ ఎఱుకను, నేర్పులను మనకు అందిస్తుంది. చదువు గుండా ఒక వేదారు తప్పు ఒప్పుల నడుమ తేడాను తెలుసుకుంటూనే దీమసాన్ని పొందుతారు. నాడుప్రెంపుకు, కూటపు ఎగఁదేర్పుకు చదువే నిక్కడ. అందుకే, మంచి రాగడను కట్టుకొనుటకు అందరికీ నాణ్యమైన చదువందే తారిమి ఉండాలి.
+
+కలివిడి తెలుగు:
+ప్రపంచాన్ని మార్చడానికి విద్య అనేది అత్యంత శక్తివంతమైన ఆయుధం. ఇది వ్యక్తిగత ఎదుగుదల మరియు అభివృద్ధికి అవసరమైన జ్ఞానాన్ని, నైపుణ్యాలను మనకు అందిస్తుంది. విద్య ద్వారా ఒక వ్యక్తి తప్పు ఒప్పుల మధ్య తేడాను తెలుసుకుంటూనే ఆత్మవిశ్వాసాన్ని పొందుతాడు. దేశాభివృద్ధిలో మరియు సమాజ ఉద్ధరణలో విద్య కీలక పాత్ర పోషిస్తుంది. అందుకే, మెరుగైన భవిష్యత్తును నిర్మించుకోవడానికి ప్రతి ఒక్కరికీ నాణ్యమైన విద్యను పొందే హక్కు ఉండాలి.
+
+## 6. రావాకువలు (రాజులకథలు) — 1
+
+వాకువ పేరు: పరిదొర (జనప్రభు/రాజు)
+
+తుకాటకారులో గంగేరుప్రోలు అనే నేలపాయ ఉండేది. చూసినంతలా పచ్చతనపు పెద్ద పంటనేల, అందమైన పూల్దొడిగిన మడుఁగులు, ఆడుతుపాడుతున్న మంది, పొంగిపొరలుతున్న అలరాటములు.
+ఈ గర్గలనేలనేలిన పేరిమిపాదు పెద్దదొరలు, వారి ముందొరలు తేఁకువరులు, నికవల్కరులు, కనికారులు, తరతరాల మన్యంలో సాటిఁడివారు, పోరులో ఓటమిఁడివారు, పేరులో కడిఁడివారు, మందిలో పగఱిఁడివారు. తండ్రిబాటలో నడిచిన కొడుకుకు యేండ్లుగడుస్తున్నాయి ఒక మంచినాడు చూసి రాజలకంతో మన్యమోపికలియ్యాలని ప్రెగడతో అంటాడు. ముందు అరయికగా పరిలోకి తిరుగులకు పంపుతాడు.
+చిన్నదొర తిరుగులకు బయల్దేరుతాడు. త్రోవలో పేద తిరిపవాడొకడు అరుగుపైపడి కనిపించగా అతనికి వాదోడుగా "నువొకరిని ఒకటి అడిగే ముందు వారికి ఒకటి ఇవ్వాలి, అప్పుడే ఇయ్యడం తీసుకోవడం సరిపోయి నీకు మరల మరల అంకిలిపడక తిరిపాలు ఇస్తారు" అని ఒక రుక్కరాసిస్తాడు. అతను మేలుకున్నాక చదివి, ఇవ్వడానికి ఏమిలేక పొద్దున అరుదైన పూలుకోసి అందరికి పంచుతూ తిర్పమెత్తగా ఇంటికి కొందరు, గుడికి కొందరు, బడికి కొందరు అందంగించడానికి పనికొస్తాయని అలరాటముగా పూలుతీసుకొని అతనికి తిండిపెడతారు. అతను ఇక నానాట పులుతెచ్చిస్తూ తిరిపమెత్తుకోసాగాడు.
+ఈ మంచితలపును పారఁజూసిన పెద్దదొర ఎంతో పొంగిపోతాడు, జాగుచేయక రాజలకంతో పరిదొరను చేసారు, చిన్నదొర ప్రోలును ముందటులవలె మంచిగా యేలుతాడు. గంగేరుప్రోలు వెలుగొందింది.
+
+Glosses:
+- రావాకువలు = రాజులకథలు
+- తుకాట కారు = ప్రాచీన కాలం
+- గంగేరు ప్రోలు = గంగేరు నగరం/దేశం
+- నేలపాయ = భూభాగం
+- మడుఁగు = సరస్సు/lake
+- అలారటం = ఆనందం
+- గర్గలనేల = పుణ్యభూమి
+- పేరిమిపాదు = గౌరవనీయ
+- ముందొరలు = ముందు దొరలు
+- తేఁకువరులు = ధైర్యవంతులు
+- నికవల్కరులు = సత్యవాదులు
+- కనికారులు = కరుణామయులు
+- మన్యం = రాజ్యం
+- సాటిఁడివారు = అసమానులు
+- పోరు = యుద్ధం
+- ఓటమిఁడివారు = ఓటమిలేనివారు
+- కడిఁడివారు = అనంతులు
+- పగఱిఁడివారు = పగవాళ్ళులేనివాళ్ళు
+- రాజలకం = పట్టాభిషేకం
+- మన్య మోపిక = రాజ్య బాధ్యత
+- ప్రెగడ = మంత్రి
+- అరయిక = పరీక్ష
+- పరి = జనం/public
+- సరిసాటి = సమానం
+- తిరిపం = భిక్షం
+- తిరిప = భిక్షగాడు
+- రుక్క = చీటి
+- అందంగించడానికి = అలంకరించడానికి
+- పారఁజూడటం = గమనించడం
+
+## 7. Technical/professional vocabulary
+
+- పెంపుకాను / పెంపరి = developer
+- మరకాను = engineer
+- బిసకాను = technician
+- నెంతాది పెంపుకాను / పెంపరి = Software developer
+- నెరపోగు పెంపుగారం = Full-stack development
+- వల పెంపుగారం = Web development
+- మునుకొన పెంపుకాను / పెంపరి = Frontend developer
+- వెనుకొన పెంపుకాను / పెంపరి = Backend developer
+- ఆట పెంపుకాను / పెంపరి = Game developer
+- ఏలితెలివి మరకాను = AI engineer
+- వాడుకరితెర కాగీటరి = User Interface designer
+- తెల్వందాది సరియేలరి = Database administrator
+- చేపట్టు నెఱపరి = Project manager
+- ఉర్వాది బిసకాను = Hardware technician
+
+## 8. ఎడాటానికి తౌలమాటలు — Subject/matter vocabulary
+
+- ఎడాటం = విషయం / subject/matter
+- పరియ = అంశం / topic
+- ఎగ్గుర్తు = సారాంశం
+- తెలిమి = పరిజ్ఞానం / Knowledge
+- నిఱం = విషయవస్తు / Content
+- కతన = logic
+- విడఁబర్పు = Explanation
+- ఆకళింపు = understanding
+- లోరువులు = వివరాలు / Details
+- లోరువాటి = detailed
+- మునుచెప్పిదం = premise/primary statement
+- తలపోత = చింతన / thought
+- కనుగోలింపు = విచారణ / inquiry
+- నేటు = నిర్ణయం / decisions
+- పసించు = గ్రహించు / to comprehend
+- నుడింపు = అనువాదం / Translation, Interpretation
+- మీఁదువల్కు / మీఁదువల్కరం = వ్యాఖ్యానం / Commentary, Annotation
+- విరలింపు = విశ్లేషణ / Analysis
+- విరలాది = విశ్లేషణాత్మక వివరణ
+- తెఱకువ = వివేకం / Discernment
+- తేఁటదనం = స్పష్టత / Clarity
+- విఁడబర్చుడు = వివరణాత్మకం / Explanatory
+- మెదలం = భావన / imagination/notion
+- అనుకోలు = అభిప్రాయం / Opinion
+- గుఱికోలు = ఉద్దేశం / Intention
+- ఆలకం = అవధానం / attention
+- అరగలి తీరింపు = సందేహ నివృత్తి / Doubt clarification
+- చాటన = ప్రకటన / declaration
+- వాగీటు = వర్ణన / describe
+- చూపకం = presentation
+- తేఱిచూడ్కి = observation
+- వాగీటువ గుమిలెక్కరం = వివరణ గణన / Descriptive statistics
+- మెండీట = criticism
+- బిమ్మిటిపాదు = doubtful
+
+## 9. Foundational-source note
+
+బంగారు నాణేలు (1st edition) is the foundational historical grammar source identified by the user. It is described as the first book introducing Melimi Telugu/native-Telugu-based register.
+
+The full 1st-edition grammar supplied by the user is preserved in the conversation corpus and should be treated as the historical baseline. It includes:
+- తుకాట మునుజేర్పులు
+- కొత్త మునుజేర్పులు
+- పదగ్రములు
+- పదాంచలములు
+- ఆద్యక్షర శేషత
+- ఆమ్రేడితములు
+- పోలికల formations
+- వెనుజేర్పులు
+- కాను/కాన్, వాను/వాన్, మారి
+- అలవి/అల్వి, అరిది/అర్ది
+- పాదు/పఱ
+- ద/ఇద
+- అ, అంగి, మాలు
+- కము/ఇకము, గము, ఓరు, ఆది, ఓలి, ఓజ, ఇ
+- adjective-forming suffixes
+
+Historical rule: later additions must be distinguished from the 1st-edition baseline rather than silently overwriting it.
+
+## 10. Important lexical distinction
+
+- ప్రంగాణియం = భారత దేశం
+- ప్రంగాణియ = భారతీయ
+
+## 11. Project handling rule
+
+Preserve user-supplied spellings and meanings as corpus data. Do not silently normalize forms to Standard Telugu. When a later term differs from a 1st-edition form, preserve both with provenance/version information.
+
+
+===== BANGARU NANELU — 1ST EDITION SMALL GRAMMAR =====
+
+బంగారు నాణేలు తెల్లడిలోని ముందు ఎడాటాలు
+
+తుకాట మునుజేర్పులు (ఉపసర్గాలు):
+అడి (మిక్కిలి)
+అలన్‌ (గతము)
+అలన్‌ (మరల మరల)
+అసి (తక్కువ)
+ఆ (తనవైపు)
+ఇని / ఇను (కొంచెం ఎక్కువ)
+ఎగన్‌ (పైకి)
+ఎడ / ఎడన్‌ (దూరముగా, విడివిడిగా)
+ఎదురు (ప్రతిగా)
+ఎస / ఎసన్‌ / ఎసల్‌ (ఎక్కువ, తక్కువ)
+ఒడ / ఒడన్‌ / ఒన / ఒనన్‌ (దగ్గరగా, అనుకూలముగా)
+క్రీన్‌ / క్రిన్‌ (క్రింద)
+దిగన్‌ (క్రిందకు)
+తోన్‌ (తోడుగా)
+పడ / పెడన్‌ (అవతల, దూరముగా)
+పై / పైన్‌ (పైకి)
+మీదు (మీద)
+మీన‌్ (మీంద)
+మరు / మారు (తరువాతి, మరల, ప్రత్యామ్నాయముగా)
+మున్‌ / మును (ముందు, ఇదివరకు)
+మై / మైన్‌ (తోడుగా)
+లోన్‌ (లోపల, మనస్సులో)
+వెన్‌ / వెను / వెనుక (వెనుకకు, తరువాత)
+సాన్‌ (సగము)
+మిడి (సైయెత్తు)
+వైన్‌ / వై (దారి, దారిలో)
+
+కొత్త మునుజేర్పులు :
+ఐన్/ఐ (అన్ని వైపుల/అన్ని వైపుల నుండి)
+తమూ(తమలో తాము)
+అక(కానటువంటి)
+ఔన్‌/మన్ (మంచి, positive)
+సి/సీ(చెడు)
+కై(కి, కు, కొఱకు)
+ఓ(అతిగా, ఎక్కువగా)
+తరు(తరువాత)
+మఱి/మఱీ(అతిగా ఎక్కువగా)
+బై(ప్రక్కన, దగ్గర, తోడుగా, సహాయముగా,ఉప)
+అమా(అకస్మాత్తుగా)
+ఎల/ ఎలన్‌/ ఎల్‌(అన్నియు, అందఱు)
+వి(విడి, విడిగా, వేఱుగా, వేఱైన)
+లా/లాన్‌(వేఱు, వేఱైన, స్వంతము కానట్టి)
+సై(సిద్దము, సిద్దముగా, ముందే)
+ఆయి(అదే)
+సరి(ఒకే విధముగా, ఎప్పటి వలెనె, సరిగా, మంచిగా, చక్కగా, అందముగా)
+పొలో(సామూహికముగా, గుంపుగా)
+అపా(ఎల్లప్పుడు)
+తిరి(మరల)
+మెల(జాగ్రత్తగా, మెల్లగా)
+ఉడున్‌(ఉడుఁగు (కోల్పోవు))
+
+పదగ్రములు :
+దరి(దగర)
+లలి(ప్రేమతో, ఇష్టముతో)
+కడ(చివర)
+చేన్‌/చేయన్‌(చేయుటకై, చేయునట్లుగా, చేయునని, చేయుమన)
+కాన్‌(అగుటకు, అగునట్లుగా, అగునని, కమ్మని)
+రాన్‌(వచ్చుటకు, వచ్చునట్లుగా, వచ్చునని, రమ్మని)
+పోన్‌(పోవుటకు, పోవునట్లు, పోవునని, పొమ్మని)
+పేరు(పెద్ద)
+బోరు(పెద్ద)
+ప్రెన్‌/ప్రెను/పెన్‌/ప్రెను(పెద్ద)
+ఇల(ఇంటి యొక్క, కుటుంబపు, వంశపు)
+తన్‌/తమ్‌(తనను, తన యొక్క)
+తాన్‌/ తా = తనయంతట తాను
+కౌన్ = కలిసి, కలిపి
+కలన్/కలయన్ = కలియునట్లుగా
+వెలి = బయట (కు)
+మై/మే/మేన్ = శరీరపు, శరీరముతో.
+మేల్ = మంచి
+రో = డబ్బు, ఆర్థికం
+ఎల/ఎల్ల = అంతయు, అందఱు
+పరి = ప్రజా/ పబ్లిక్
+వా = నోరు, మాట, నోటితో, మాటలలో
+కో/కోన్ = దేవునికి లేదా అదృష్టమునకు సంబంధించిన, పవిత్రమైన, దివ్యమైన
+కడు = ఎక్కువగా
+మిన్న్ = అంతరిక్షము, రోదసి
+విన్న్ = ఆకాశము
+మ్రాన్/మ్రా = చెట్టు, చెట్లకు సంబంధించిన
+ఱ = తాయి. జాతికి సంబంధించిన
+పారి = భూమి, నేల లేదా మట్టికి సంబంధించిన
+వల = వలపు
+మన్ = మట్టికి సంబంధించిన
+రా = రాజునకు, లేదా ప్రభుత్వమునకు సంబంధించిన, ఆధికారికమైన
+రే = రాత్రికి సంబంధించిన
+వే = వేగము, వేయి, వేఱు
+రట్టు/రటు = బహిరంగము
+గుట్టు/గుటు = రహస్యము
+తరము/తర = వరుస
+నేన = జ్ఞాపకము
+కరి = సాక్ష్యము
+బైలు/ బైల్ = బయట, విఱివైన పెద్ద పెఱడు.
+తెలి = తెలుపు, తెల్లము, తెలిసినవాఁడు. మొదలైనవి.
+లెస్స/లెస = మంచి, బాగు, మేలు, శ్రేష్ఠము
+మైమై = మెల్లగా క్రమముగా
+కల = యథార్థమైన. మొదలైనవి.
+
+పదాంచలములు
+వాసి = నట్టు
+జనితం = మావి (మచ్చుక : పులుమావి)
+ధారి = తాల్పు (మచ్చుక : నెలతాల్పు)
+అంతం = అర్తి
+ఆది = ఏరు/ఏరి
+
+ఆద్యక్షర శేషత ననుసరించి క్రొత్త మాటల వానకము
+కరఁగు + కల్లు→ కరకల్లు (కరఁగెడి తాయి లోహము)
+చిచ్చు (నిప్పు) + క్రోవి (గొట్టము) చిక్రోవి (నిప్పుల గొట్టము తుపాకి) సిక్రోవి.
+ప్రొద్దు + పాఱిక ప్రొవ్వాటిక/ ప్రావాఱిక/ ప్రోవాఱిక (సూర్యునకై నీటిని అర్ఘ్యముగా పాటించుట - సంధ్యావందనము)
+ఉండు + వలతి→ ఉన్ వలతి = ఉన్వలతి (ఉండెడి చోటు నివాస స్థానము-చిరునామా, address)
+మోము + తీరు→ మోదీరు (వైఖరి)
+గంగి + నూలు (పవిత్రమైన దారము)గన్నూలు (యజ్ఞోపవీతము)
+గంగి + నోలు (పవిత్ర గ్రంథము) గన్నోలు
+తిరిగి తిరి = మరల (సంస్కృతములోని 'పునః' కు సమానార్ధకముగా.
+బ్రదిమి→ బ్రది, బ్రదీ = బ్రదుకునట్టి, బ్రదికి ఉన్న (live/ alive); మఱియు బ్రదుకునకు సంబంధించిన.
+సమయు→ సమ/సమా = చావు, చావునకు సంబంధించిన, చనిపోయిన.
+ఉండుదేఱు→ ఉందేఱు = హాజరగు ; ఉందేఱిక = హాజరీ ; ఉందేఱువు = హాజరైన మనిషి : ఉందేఱమి = గైర్హాజరీ.
+
+ఆమ్రేడితముల గుండా క్రొత్త మాటల వానకము
+చివర చివర→ చిట్టచివర చిటారు (పరమోన్నత అగ్రము)
+మిడిమిడి → మిట్టమిడి = మిటారము (ఎగిరెగిరి పడుట)
+గుడి గుడి (గుండ్రము గుండ్రము) = గుడారము
+కడ కడ→ కట్టకడ = కటారు (అంతము)
+మఱు + మఱు = మమ్మఱు (మాటిమాటికి) మమ్మఱించు మామణించు = (ఆమ్రేడించు. పునరావృత్తము చేయు - To repeat)
+మామఱింపు = ఆమ్రేడన, పునరావృత్తి
+మామఱిదం = ఆమ్రేడితము పునరావృత్తము
+తఱచు + తఱచు = తందఱచు —> తందరుసు (సామాన్యము)
+సైకము + సైకము (కొంచెము కొంచెము) ససైకము (కనీసము)
+సలుపు + సలుపు (చేయు చేయు) సంసల్పు (సాధన చేయు) To practise)
+వంచి + వంచి (ఒకటి ఒకటి వావంచి = ఏకైకము (unique)
+వంచ + వంచ (ముఖ్యము ముఖ్యము వావంచ= కీలకము (నావంచ సపాట - కీలక హోదా, key position)
+
+పోలికల (analogy) గుండా క్రొత్త మాటల వానకము
+ప్రాఁత→ ప్రాచీ = ప్రాచిపోయినది
+క్రొత్త → క్రోచి = తాజా (fresh/latest)
+తిండి పదార్థముల విషయంలో తాజాదనమునకు కరసీమ మాండలికములో వాడు మాట 'నేవళము'
+లోవైనము = గతము
+అలవైనము = ఇతిహాసము ('ఆనాడు జరిగినది' - Epic)
+
+వెనుజేర్పుల(ప్రత్యయముల) గుండా క్రొత్త మాటల వానకము
+అరి : తెగువరి, తలవరి, జాలరి, మేదరి, నిజమరి, పోటర్, పూజారి, తలారి
+కాఁడు : వేఁటకాఁడు, ఆటగాఁడు, ననుపుకాఁడు. నీటుకాఁడు, చెలికాఁడు.
+కత్తె/కత్తియ : పనికత్తె, చెలికత్తె, వంటగత్తె. ఆటగత్తె.
+తి, తె, తుక : పడఁతి, ఒక్కర్తె, వెలఁదుక
+రాలు : పేదరాలు, ముద్దరాలు.
+ఇఁడి : సిగ్గిఁడి, వాలిఁడి, ఉప్పిఁడి.
+సరి : నెలసరి, బెట్టుసరి, దినసరి
+మారి: తంపుల మారి, తంటాలమారి, ముండలమారి
+తనము : మంచితనము. చెడ్డతనము, జాణతనము.
+ఱికము : మేనఱికము రాచఱికము, శిష్యఱికము
+
+మరికొన్ని లోతుగా :
+1. అరి, కాఁడు గాఁడు, కత్తె' లకు మారుగా 'కాను/ కాన్' = చేయునట్టి
+ముప్పుకాను (dangerous) = ప్రమాదకరము, ప్రమాదకరములు, ప్రమాదకారి, ప్రమాదకారులు
+మచ్చుకలు : వాఁడు ముప్పుకాను. అది ముప్పుకాను. ఆమె ముప్పు కానిత (స్త్రీలకు కాను/కానిత ఏదైనా)
+కాను/కాన్ యొక్క భావార్ధకము 'గారము' లేక 'కానికము' ఉదాహరణకు ముప్పుకాను ముప్పుకానికము, ముప్పుగారం (ప్రమాదకరం).
+
+2. 'వాను/ వాన్' : 'కలిగిన సంబంధించిన'
+నెనరు = కృతజ్ఞత : నెనరువాను/ నెనర్వాను/ నెనర్వాన్ = కృతజ్ఞుఁడు
+ప్రాయి = అదృష్టము : ప్రాయివాను/ ప్రాయివాన్ = అదృష్టవంతుఁడు
+నోలు = గ్రంథము : నోలువాను = గ్రాంథికము
+మై = శరీరము : మైవాను/ మైవాన్ = భౌతికము (మైవాను ఆకట్టు=భౌతిక ఆకర్షణ)
+i. విశేషణ పదములతో వ్యక్తులను, వస్తువులను ఆపాదించుటకు సైతము 'వాను' ఎసవాడవచ్చును. ఉదాహరణకు-
+బ్రాక/ బ్రాకము - బలహీనము : బ్రాకవాను = బలహీనుఁడు, బలహీనురాలు, బలహీన వస్తువు.
+ii. ఏ విధమైన లింగసూచక ప్రత్యయములు గానీ లేని నామవాచకములకు కూడ స్వార్థకముగా వాను/వాన్ చేర్చవచ్చును. ఉదాహరణకు-
+రెంచ = మనిషి : రెంచవాను (అదే, మనిషి)
+మాస్టి = శూరుఁడు : మాస్టివాను (అదే, శూరుఁడు)
+iii. క్రియాధాతువులకు కూడ వాను/వాన్ చేర్చవచ్చు. అటువంటి సందర్భములలో ఇది 'అరి'కి ప్రత్యామ్నాయమగును. ఉదాహరణకు-
+గెలుచు + వాను గెలువాను = గెలుచువాఁడు గెలుచువది (విజేత విజేత్రి)
+నిలుచు + వాను నిలువాను = నిలచునది (durable, enduring)
+ఏలు + వాను→ ఏలువాను = ఏలెడివాఁడు, ఏలునది (పరిపాలకుఁడు Governor)
+iv. కావలెననుకొన్నచో 'వాను/వాన్' కు కూడ స్త్రీలింగప్రత్యయములను చేర్చి లింగ విశిష్టముగా మార్చి ఐతే పుల్లింగ నపుంసక లింగ రూపములలో మటుకు మార్పుండదు. ఉదా :-
+వాఁడు మోపికవాను/ మోపికరి (బాధ్యతాయుతుఁడు).
+ఈ అమరము మోపికవాను/ మోపికరి (ఈ వ్యవస్థ బాధ్యతాయుతము).
+ఆమె మోపికవాను/మోసికరి/మోపికవానిత/ మోసికతి/ మోపికరాలు (ఆమె బాధ్యతాయుతురాలు).
+v. వాను/వాన్ యొక్క భావార్థకము 'వానికము'. ఉదాహరణకు-
+తారివాను = యజమానుఁడు; తారివానికము = యాజమాన్యము
+
+3. మంచి/ తటస్థ = 'మారి'
+పనిమారి = కార్యశీలుఁడు. కార్యశీల (active). పనియే శీలముగా గలవాఁడు పనిమారి.
+i. దీని భావార్ధకము 'పనిమారము: (activity), (చెలికాఁడు చెలికారము వలె), కార్యశీలము.
+ii. కావలెనన్నచో దీనికి కూడ స్త్రీలింగ ప్రత్యయమును చేర్చవచ్చును. ఉదాహరణకు- పనిమారిత ఇట్లే-
+బాసటమారి = బాసట ఇచ్చుటయే స్వభావముగా గలవాఁడు. (భావార్ధకము: బాసటమారము = సహాయ శీలము)
+చదువుమారి = చదువుటయే స్వభావముగా గలవాఁడు (భావార్ధకము చదువుమారము = అధ్యయన శీలము)
+
+4. అలవి/ అల్వి : చేయుటకు శక్యము, సాధ్యము యోగ్యము, అర్హము అని దీని అర్థము.
+చదువన్ + అల్వి చదువల్వి = చదువఁదగిన(ది), పఠనీయము (readable)
+వినన్ + అల్వి→ వినల్వి = వినఁదగినది, శ్రోతవ్యము (audible)
+తినన్ + అల్వి తినల్వి = తినఁదగినది, భక్షణీయము (edible)
+ఉండన్ + అల్వి→ ఉండల్వి = ఉండఁదగినది, వసితవ్యము (livable).
+
+5. అరిది/ అర్ది' ప్రత్యయము ఇది 'అలవి' ప్రత్యయమునకు వ్యతిరేకార్థకము.
+చదువన్ + ఆర్ది→ చదువరి = చదువఁదగని (ది), అపఠనీయము (unreadable)
+వినన్ + ఆర్ది→ విసర్ది = వినఁదగనిది, అశ్రోతవ్యము (inaudible)
+తినన్ + ఆర్ది తిసర్ది = తినఁదగనిది, అభక్షణీయము (inedible)
+ఉండన్ + ఆర్ది → ఉండర్ది = ఉండఁదగనిది, అవసితవ్యం (unlivable).
+
+6. పాదు ప్రత్యయము
+ఈవి + పాదు = ఈవిపాదు
+దీవన + పాదు→ దీవనపాదు
+దండము + పాదు→ దండపాదు
+
+7. పఱ ప్రత్యయము
+ఈని + పఱ = ఈవిపఱ
+దీవన + పఱ→ దీవనపఱ
+దండ + పఱ→ దండపఱ
+
+8. ద/ఇద ప్రత్యయము : కాఁబడిన, చేయఁబడిన
+ఒప్పు + ఇదము→ఒప్పిదము
+తప్పు + ఇదము←తప్పిదము
+చెయ్యు + ఇదము →చెయిదము
+పెల్లు + ఇదము ←పెల్లిదము
+బెట్టు + ఇదుఁడు → బెట్టిదుఁడు
+పోరు + ఇతము→పోరితము
+ఇంచు + ఇతము←ఇంపితము
+క్రొవ్వు + ఇదము→క్రొవ్విదము
+కోరు + ఇదము --> కోరిదము
+తెలియు + ఇదము --> తెలిదము
+విఱియు + ఇదము → విఱిదము
+ఎడారి +దం ఎడారిదం
+
+9. 'అ' ప్రత్యయము
+కట్టు + అ = కట్ట
+వ్రచ్చు + అ = వ్రయ్య
+కోయు + అ→ కొయ్య
+కడచు + ఆ→ కడప/ గడప
+కూడు + అ→ కలియు = కూడ/కూర
+ప్రేలు + అ→ ప్రేల = popcorn
+మీటు + అ→ మీట
+నడచు + అ→ నడవ
+పాయు + అ→ విడు/ వీడు
+తెలియు + అ తెలియ, తెల్ల
+నలియు + ఆ→ నలియ, నల్ల
+వెలియు + అ→ వెలియ, వెల్ల
+ఎఱియు + అ ఎఱియ, ఎఱ్ఱ
+తెములు + అ = తెమడ
+ఎండు + అ = ఎండ
+
+10. అంగి ప్రత్యయము
+బారంగి
+ఓడంగి
+ఆడంగి
+కోనంగి
+వెచ్చ + అంగి = వెచ్చంగి → వేసంగి → వేసఁగి → వేసవి
+నెఱ్ఱు + అంగి→ నెఱంగి
+వెల + అంగి = వెలంగి
+ఇరు + అంగి→ ఇరంగి
+పది + అంగి = పదంగి
+నూఱు + అంగి = నూఱంగి
+వేయి + అంగి = వేయంగి
+
+11. మాలు ప్రత్యయము : రహితము
+పేరుమాలు
+అక్కఱమాలు
+నెరసుమాలు
+పేరుమాలువు, పేరుమాలువులు, పేరుమాలిత, పేరుమాలితలు, పేరుమాలు, పేరుమాలులు
+పేరుమాలిక
+
+12. కము, ఇకము
+కవైణికము
+మిహికము
+తోబుట్టుకము
+తామట్టుకము
+విచ్చుకము
+
+13. గము
+పరిగము
+ఎన్నరిగము
+
+14. ఓరు
+పాటియోరు
+మణియోరు
+లెంకోరు
+కోలీవియోరు
+నెఱపోరు
+
+15. ఆది
+నెరవాది
+బారాది
+పంచాది
+మోపాది
+ఇంటివేలుపాది / ఇంటిల్లిపాది
+ఏడాది
+వందలాది
+వేలాది
+నిల్పాది/నింపాది
+ఉరువాది/ఉరాది
+మానాది
+
+16. ఓలి
+మాటోలి
+కందోలి
+వ్రాయోలి
+వ్రాయాది వరుస
+
+17. ఓజ
+బ్రదుకోజ
+తలఁపోజ
+ఏలోజ
+మనోజ
+కట్టోజ
+గెఱోజ
+
+18. ఇ
+త్రెంపి
+తొలుకారి/తొలుకరి
+ఉబ్బి
+బొత్తి
+దరిగాఁపి
+
+విశేషణ కల్పనకై వాడంబడు ప్రత్యయములు
+అ, ఇ, తి, టి/అటి, ఇటి, ఇంటి, ఆటి, పాటి, పారు, బారు, ఓక, పు/మ్బు, -సరి, -మారి, గొట్టు
+ఇ: ఊరు => ఊరి
+తి: గోయి => గోతి
+టి: తాడు => తాటి
+పు/మ్పు: నిక్కము + ఎఱుక = నిక్కపుటెఱుక, నిక్కంపుటెఱుక
+అ: అడాకులు => అడ్లాకుల
+పొడవు + ఆటి = పొడవాటి
+చిన్న + పాటి = చిన్నపాటి
+ఱాయి + పారు = ఱాతిపారు
+నేల + బారు = నేలబారు
+కైకట్టు + ఇ = కైకట్టి
+ఎసరేఁక + టి = ఎసరేకటి
+ఎర్మి + టి = ఎర్మిటి
+వెల + ఆటి = వెలాటి
+విలువ + ఆటి = విలువాటి
+డెందము + ఆప = డెందాప
+ఉలము + ఆప = ఉల్లాప
+వాయరము + ఆప = వాయరాప
+పొన్నము + ఆప = పొన్నాప
+మై + ఆత = మయ్యాత
+పారి + ఆత = పారియాత
+నెసరు + ఆత = నెసరాత
+నెల + ఆత = నెలాత
+పారి + ఆమి = పారియామి
+రా + ఆమి = రాయామి
+
+
+===== IMPORTANT MELIMI TELUGU VOCABULARY / LEXICON =====
+
+Days:
+నెసరేడం = ఆదివారం
+జాబిలేడం = సోమవారం
+కెంబలేడం = మంగళవారం
+నెలాతేడం = బుధవారం
+కాంచువేడం = బేస్తవారం
+వేఁగేడం = శుక్రవారం
+గాడ్పలేడం = శనివారం
+
+Astronomy:
+మిన్వాఁక = Galaxy
+మిణుగుత్తి = Star cluster
+సిరిక = Meteor
+తోకజుక్క = Comet
+విన్నరవ = Asteroid
+పాలపుంత / పాలవెల్లి = Milky Way
+నెసరమరం = Solar System
+నెసరు = Sun
+జాబిలి = Moon
+నెలాత = Mercury
+వేగుపలి = Venus
+కెంబలి = Mars
+నేలతల్లి / పారిగుండ్రం = Earth
+కాంచువు = Jupiter
+గాడ్పలి = Saturn
+మాతి = Rahu
+సీదరం = Ketu
+
+Core terminology:
+మేలిమి = best
+ముప్పు = danger
+కాను = agent/doer suffix; gender-neutral/all-applicable
+వాను = having/related-to suffix
+హత్తరం = ప్రభావం (effect/impact/influence)
+హత్తరకాను = effective
+హత్తరమారి = influential
+అమరం = వ్యవస్థ
+మెదలం = భావం
+నిరుసటి = క్రమబద్ధం
+బిసెర్మి = సాంకేతికత
+తైలం = సంబంధం
+తౌలమైన = సంబంధమైన
+చేబైలు = రంగం
+కుదురుకొను = స్థిరపడు
+విరివి = విస్తృతం
+ఐనిండు = పూర్తి
+పోతరం / బలిమి = బలం
+ఎల్తరం = సమగ్రం
+తేట = స్పష్టం
+తనకం = సహజం
+వంచంగా = ముఖ్యంగా
+కారు = కాలం
+తరి (ఱ) = కాలం
+
+Recent network vocabulary:
+వలకట్టు = network
+తమూవల వలకట్టు = Internet network
+తమూవల తగులింపు = Internet connection
+వలకట్టు నెప్పరం = Network speed
+వలకట్టు మిసుకులు = Network signals
+వలకట్టు త్రోవ = Network route
+వలకట్టు నటారం = Network hub
+
+Technical vocabulary:
+పెంపుకాను / పెంపరి = developer
+మరకాను = engineer
+బిసకాను = technician
+నెంతాది పెంపుకాను / పెంపరి = Software developer
+నెరపోగు పెంపుగారం = Full-stack development
+వల పెంపుగారం = Web development
+మునుకొన పెంపుకాను / పెంపరి = Frontend developer
+వెనుకొన పెంపుకాను / పెంపరి = Backend developer
+ఆట పెంపుకాను / పెంపరి = Game developer
+ఏలితెలివి మరకాను = AI engineer
+వాడుకరితెర కాగీటరి = User Interface designer
+తెల్వందాది సరియేలరి = Database administrator
+చేపట్టు నెఱపరి = Project manager
+ఉర్వాది బిసకాను = Hardware technician
+
+Subject/matter vocabulary:
+ఎడాటం = విషయం / subject/matter
+పరియ = అంశం / topic
+ఎగ్గుర్తు = సారాంశం
+తెలిమి = పరిజ్ఞానం / Knowledge
+నిఱం = విషయవస్తు / Content
+కతన = logic
+విడఁబర్పు = Explanation
+ఆకళింపు = understanding
+లోరువులు = వివరాలు / Details
+లోరువాటి = detailed
+మునుచెప్పిదం = premise/primary statement
+తలపోత = చింతన / thought
+కనుగోలింపు = విచారణ / inquiry
+నేటు = నిర్ణయం / decisions
+పసించు = గ్రహించు / to comprehend
+నుడింపు = అనువాదం / Translation, Interpretation
+మీఁదువల్కు / మీఁదువల్కరం = వ్యాఖ్యానం / Commentary, Annotation
+విరలింపు = విశ్లేషణ / Analysis
+విరలాది = విశ్లేషణాత్మక వివరణ
+తెఱకువ = వివేకం / Discernment
+తేఁటదనం = స్పష్టత / Clarity
+విఁడబర్చుడు = వివరణాత్మకం / Explanatory
+మెదలం = భావన / imagination/notion
+అనుకోలు = అభిప్రాయం / Opinion
+గుఱికోలు = ఉద్దేశం / Intention
+ఆలకం = అవధానం / attention
+అరగలి తీరింపు = సందేహ నివృత్తి / Doubt clarification
+చాటన = ప్రకటన / declaration
+వాగీటు = వర్ణన / describe
+చూపకం = presentation
+తేఱిచూడ్కి = observation
+వాగీటువ గుమిలెక్కరం = Descriptive statistics
+మెండీట = criticism
+బిమ్మిటిపాదు = doubtful
+
+Important distinction:
+ప్రంగాణియం = భారత దేశం
+ప్రంగాణియ = భారతీయ
+
+
+===== TELUAI IMPLEMENTATION LANGUAGE REQUIREMENTS =====
+
+The application must treat Melimi Telugu as a distinct language/register system; use the authoritative corpus for vocabulary, grammar, derivation, terminology, provenance, register control, retrieval, validation and correction. See melimi_telugu/rules/complete_language_requirements.md for the full implementation checklist.

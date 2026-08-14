@@ -1,0 +1,21 @@
+[
+  {"standard":"network","melimi":"వలకట్టు","status":"established","domain":"technical"},
+  {"standard":"Internet network","melimi":"తమూవల వలకట్టు","status":"established","domain":"technical"},
+  {"standard":"Internet connection","melimi":"తమూవల తగులింపు","status":"established","domain":"technical"},
+  {"standard":"Network speed","melimi":"వలకట్టు నెప్పరం","status":"established","domain":"technical"},
+  {"standard":"Network signals","melimi":"వలకట్టు మిసుకులు","status":"established","domain":"technical"},
+  {"standard":"Network route","melimi":"వలకట్టు త్రోవ","status":"established","domain":"technical"},
+  {"standard":"Network hub","melimi":"వలకట్టు నటారం","status":"established","domain":"technical"},
+  {"standard":"developer","melimi":"పెంపుకాను / పెంపరి","status":"established","domain":"software"},
+  {"standard":"Software developer","melimi":"నెంతాది పెంపుకాను / పెంపరి","status":"established","domain":"software"},
+  {"standard":"Full stack development","melimi":"నెరపోగు పెంపుగారం","status":"established","domain":"software"},
+  {"standard":"web development","melimi":"వల పెంపుగారం","status":"established","domain":"software"},
+  {"standard":"Frontend developer","melimi":"మునుకొన పెంపుకాను / పెంపరి","status":"established","domain":"software"},
+  {"standard":"Backend developer","melimi":"వెనుకొన పెంపుకాను / పెంపరి","status":"established","domain":"software"},
+  {"standard":"Game developer","melimi":"ఆట పెంపుకాను / పెంపరి","status":"established","domain":"software"},
+  {"standard":"AI engineer","melimi":"ఏలితెలివి మరకాను","status":"established","domain":"software"},
+  {"standard":"User Interface designer","melimi":"వాడుకరితెర కాగీటరి","status":"established","domain":"software"},
+  {"standard":"Database administrator","melimi":"తెల్వందాది సరియేలరి","status":"established","domain":"software"},
+  {"standard":"project manager","melimi":"చేపట్టు నెఱపరి","status":"established","domain":"software"},
+  {"standard":"Hardware technician","melimi":"ఉర్వాది బిసకాను","status":"established","domain":"hardware"}
+]

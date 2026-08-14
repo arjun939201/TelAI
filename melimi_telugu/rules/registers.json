@@ -1,0 +1,17 @@
+{
+  "registers": [
+    "melimi",
+    "standard_telugu",
+    "mixed_telugu",
+    "conversational",
+    "formal_literary",
+    "academic",
+    "technical",
+    "telugu_first_modern"
+  ],
+  "melimi_identity": "Melimi Telugu is a distinct Telugu-based language/register system with its own lexical and derivational authority. It is not a blind replacement filter.",
+  "authority": ["melimi_telugu corpus", "approved vocabulary", "documented grammar", "documented word formation"],
+  "generation_engine": "Groq/LLM",
+  "unknown_is_not_loan": true,
+  "unsupported_invention_is_not_authoritative": true
+}

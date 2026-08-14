@@ -1,0 +1,13 @@
+[
+  {"forms":["కాను","కాన్"],"class":"noun/nominal","meaning":"చేయునట్టి; agentive/characterizing; whole meaning depends on base","examples":["ముప్పుకాను","పాటకాను","పెంపుకాను","పాటుకాను"]},
+  {"forms":["వాను","వాన్"],"class":"noun/nominal","meaning":"కలిగిన; సంబంధించిన","examples":["నెనరువాను","ప్రాయివాను","మైవాను","గెలువాను"]},
+  {"forms":["మారి"],"class":"noun/nominal","meaning":"మంచి/తటస్థ quality or characteristic","examples":["పనిమారి","బాసటమారి","చదువుమారి"]},
+  {"forms":["అలవి","అల్వి"],"class":"verb","meaning":"చేయుటకు శక్యము; సాధ్యము; యోగ్యము; అర్హము","examples":["చేయల్వి","చదువల్వి","వినల్వి","తినల్వి","ఉండల్వి"]},
+  {"forms":["అరిది","అర్ది"],"class":"verb","meaning":"అలవి/అల్వికి వ్యతిరేకము; చేయుటకు తగనిది","examples":["చదువరి","విసర్ది","తిసర్ది","ఉండర్ది"]},
+  {"forms":["పాదు"],"class":"noun","meaning":"తగినది; యోగ్యమైనది"},{"forms":["పఱ"],"class":"noun","meaning":"తగనిది; అనర్హమైనది"},
+  {"forms":["ద","ఇద","ఇతము"],"class":"root/nominal","meaning":"కాఁబడిన; చేయఁబడిన","examples":["ఒప్పిదము","తప్పిదము","చెయిదము","పోరితము","తెలిదము","విఱిదము"]},
+  {"forms":["అ"],"class":"root","meaning":"Proto-Telugu documented formation suffix"},{"forms":["అంగి"],"class":"root","meaning":"documented derivational family"},
+  {"forms":["మాలు"],"class":"noun","meaning":"రహితము; కలిగి ఉండనిది"},{"forms":["కము","ఇకము"],"class":"noun","meaning":"abstract/state formation"},
+  {"forms":["గము"],"class":"noun","meaning":"ఒక మొత్తము; గుంపు"},{"forms":["ఓరు"],"class":"noun","meaning":"సంస్థ; వ్యవస్థ"},{"forms":["ఆది"],"class":"noun","meaning":"మొత్తము; సమాహారము; సమూహము"},
+  {"forms":["ఓలి"],"class":"noun","meaning":"వరుస"},{"forms":["ఓజ"],"class":"noun/verb","meaning":"క్రమము; విధము; విధానము; పద్ధతి; శైలి"},{"forms":["ఇ"],"class":"root","meaning":"కల్గిన; చేయునట్టి"}
+]

@@ -1,0 +1,163 @@
+[
+  {
+    "standard": "నమస్కారం",
+    "melimi": "టేంకణములు",
+    "status": "established",
+    "note": "greeting"
+  },
+  {
+    "standard": "సహాయం",
+    "melimi": "బాసట",
+    "status": "established",
+    "note": "help / assistance"
+  },
+  {
+    "standard": "సాయం",
+    "melimi": "తోడ్పాటు",
+    "status": "established",
+    "note": "help / assistance"
+  },
+  {
+    "standard": "ప్రభావం",
+    "melimi": "హత్తరం",
+    "status": "established",
+    "note": "effect / impact / influence"
+  },
+  {
+    "standard": "వ్యవస్థ",
+    "melimi": "అమరం",
+    "status": "established",
+    "note": "system"
+  },
+  {
+    "standard": "భావం",
+    "melimi": "మెదలం",
+    "status": "established",
+    "note": "concept / thought"
+  },
+  {
+    "standard": "సాంకేతికత",
+    "melimi": "బిసెర్మి",
+    "status": "established",
+    "note": "technology"
+  },
+  {
+    "standard": "సహజం",
+    "melimi": "తనకం",
+    "status": "established",
+    "note": "natural"
+  },
+  {
+    "standard": "స్పష్టం",
+    "melimi": "తేట",
+    "status": "established",
+    "note": "clear"
+  },
+  {
+    "standard": "సమగ్రం",
+    "melimi": "ఎల్తరం",
+    "status": "established",
+    "note": "comprehensive"
+  },
+  {
+    "standard": "పూర్తి",
+    "melimi": "ఐనిండు",
+    "status": "established",
+    "note": "complete"
+  },
+  {
+    "standard": "బలం",
+    "melimi": "పోతరం / బలిమి",
+    "status": "established",
+    "note": "strength"
+  },
+  {
+    "standard": "ప్రమాదకరం",
+    "melimi": "ముప్పుకాను",
+    "status": "established",
+    "note": "dangerous"
+  },
+  {
+    "standard": "developer",
+    "melimi": "పెంపుకాను",
+    "status": "established",
+    "note": "developer"
+  },
+  {
+    "standard": "కృతజ్ఞుడు",
+    "melimi": "నెనరువాను",
+    "status": "established",
+    "note": "grateful person"
+  },
+  {
+    "standard": "అదృష్టవంతుడు",
+    "melimi": "ప్రాయివాను",
+    "status": "established",
+    "note": "fortunate person"
+  },
+  {
+    "standard": "భౌతికము",
+    "melimi": "మైవాను",
+    "status": "established",
+    "note": "physical"
+  },
+  {
+    "standard": "విజేత",
+    "melimi": "గెలువాను",
+    "status": "established",
+    "note": "winner"
+  },
+  {
+    "standard": "ప్రభావవంతమైన",
+    "melimi": "హత్తరకాను",
+    "status": "established",
+    "note": "effective"
+  },
+  {
+    "standard": "ప్రభావశీలమైన",
+    "melimi": "హత్తరమారి",
+    "status": "established",
+    "note": "influential"
+  },
+  {
+    "standard": "best",
+    "melimi": "మేలిమి",
+    "status": "established",
+    "note": "best"
+  },
+  {
+    "standard": "problem",
+    "melimi": "చిక్కు",
+    "status": "established",
+    "note": "problem"
+  },
+  {
+    "standard": "సమస్య",
+    "melimi": "చిక్కు",
+    "status": "established",
+    "note": "problem (native Telugu synonym of the loanword 'problem')"
+  },
+  {
+    "standard": "విషయం",
+    "melimi": "ఎడాటం",
+    "status": "established",
+    "note": "subject / matter / topic"
+  },
+  {
+    "standard": "ఆసక్తికరం",
+    "melimi": "హాళికాను",
+    "status": "established",
+    "note": "interesting; invariant noun/adjective form",
+    "functions": [
+      "noun",
+      "adjective"
+    ],
+    "adjective_invariant": true
+  },
+  {
+    "standard": "సినిమా",
+    "melimi": "తెఱాటం",
+    "status": "established",
+    "note": "cinema / film; corpus example uses తెఱాటం"
+  }
+]

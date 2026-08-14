@@ -1,0 +1,12 @@
+[
+  {"id":"lexical-problem","input":"సమస్య","expected":"చిక్కు","type":"lexical"},
+  {"id":"lexical-help","input":"సహాయం","expected":"బాసట","type":"lexical"},
+  {"id":"inflection-plural","input":"సమస్యలు","expected":"చిక్కులు","type":"inflection"},
+  {"id":"inflection-object-plural","input":"సమస్యలను","expected":"చిక్కులను","type":"inflection"},
+  {"id":"invariant-adjective","input":"ఆసక్తికరమైన ఎడాటం","expected":"హాళికాను ఎడాటం","type":"adjective"},
+  {"id":"invariant-predicate","input":"ఈ ఎడాటం హాళికానుగా ఉంది","expected":"ఈ ఎడాటం హాళికానుగా ఉంది","type":"adjective"},
+  {"id":"derived-danger","input":"ముప్పుకాను","expected":"ముప్పుకాను","type":"derivation"},
+  {"id":"noun-suffix","input":"పని + మారి","expected":"పనిమారి","type":"derivation"},
+  {"id":"verb-suffix","input":"చేయు + అలవి","expected":"చేయల్వి","type":"derivation"},
+  {"id":"technical-network","input":"network","expected":"వలకట్టు","type":"terminology"}
+]
