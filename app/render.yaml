@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: teluai
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python scripts/ensure_corpus.py
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_TOKEN
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="te">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0c">
+    <title>TeluAI — మేలిమి తెలుగు AI</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">T</div>
+            <div class="brand-text">
+                <div class="brand-name">TeluAI</div>
+                <div class="brand-subtitle">మేలిమి తెలుగు AI</div>
+            </div>
+        </div>
+
+        <button id="clearButton" class="new-chat-button" type="button">
+            <span class="plus">＋</span>
+            కొత్త మాట
+        </button>
+
+        <div class="sidebar-section">
+            <div class="section-title">నుడి తీరు</div>
+            <div class="mode-switch">
+                <button id="standardMode" class="mode-button" type="button">కొలమాన తెలుగు</button>
+                <button id="melimiMode" class="mode-button active" type="button">మేలిమి తెలుగు</button>
+            </div>
+        </div>
+
+        <div class="sidebar-section language-tools">
+            <button id="addWordButton" class="add-word-button" type="button">＋ మేలిమి పదం జోడించు</button>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="section-title">ఈనాడు</div>
+            <div id="chatHistory" class="chat-history">
+                <div class="chat-item active">
+                    <span class="chat-icon">◌</span>
+                    <span>కొత్త మాటకం</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>AI పనిచేస్తోంది</span>
+            </div>
+            <div class="powered">Groq ఆనిదం</div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="mobile-brand">
+                <div class="brand-icon small">T</div>
+                <span>TeluAI</span>
+            </div>
+            <div class="model-info">
+                <span id="modelName" class="model-name">మేలిమి తెలుగు AI</span>
+                <span class="model-badge">AI</span>
+            </div>
+            <button id="mobileNewChat" class="mobile-new-chat" type="button" aria-label="కొత్త మాట">＋</button>
+        </header>
+
+        <section id="chatContainer" class="chat-container">
+            <div id="welcome" class="welcome">
+                <div class="welcome-icon">T</div>
+                <h1>ఏమి తెలుసుకొనగోరుతున్నావు?</h1>
+                <p>
+                    మేలిమి తెలుగులో ఏదైనా అడుగు.
+                    పలుకు తెల్లాలు, మాటకట్టు, నుడి చౌకట్లు లేదా
+                    తందరసు ఎడాటాలు గురించి కూడా అడగవచ్చు.
+                </p>
+
+                <div class="suggestions">
+                    <button class="suggestion" data-message="మేలిమి తెలుగు అంటే ఏమిటి?" type="button">
+                        <span>◈</span><span>మేలిమి తెలుగు అంటే ఏమిటి?</span>
+                    </button>
+                    <button class="suggestion" data-message="హత్తరం అనే పలుక్కు తెల్లం ఏమిటి?" type="button">
+                        <span>◇</span><span>ఒక మేలిమి పలుకు తెల్లం అడుగు</span>
+                    </button>
+                    <button class="suggestion" data-message="ఒక కొత్త మేలిమి తెలుగు పదాన్ని క్రేవించు." type="button">
+                        <span>✦</span><span>కొత్త పలుకు క్రేవించు</span>
+                    </button>
+                    <button class="suggestion" data-message="మేలిమి తెలుగు మాటకట్టు ఎడాటాలు విడదెంపు." type="button">
+                        <span>⌘</span><span>మాటకట్టు నేర్చుకో</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="composer-area">
+            <form id="chatForm" class="composer">
+                <textarea id="messageInput" placeholder="మేలిమి తెలుగులో అడుగు..." rows="1"
+                          autocomplete="off" spellcheck="false"></textarea>
+                <button type="submit" id="sendButton" aria-label="పంపు">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M19 12L13 6M19 12L13 18"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+            <div class="composer-footer">
+                TeluAI తప్పులు చేయవచ్చు. ముఖ్యమైన సమాచారాన్ని నిర్ధారించుకో.
+            </div>
+        </div>
+    </main>
+</div>
+<script src="/static/js/chatbot.js"></script>
+<div id="wordModal" class="word-modal hidden">
+<div class="word-modal-backdrop" id="wordModalBackdrop"></div><div class="word-card">
+<button id="closeWordModal" class="word-close" type="button">×</button>
+<div class="word-kicker">Melimi Telugu language subject</div><h2 id="selectedWord">పదం</h2>
+<div id="wordStatus" class="word-status"></div><div class="word-analysis">
+<label>Root / మూలపలుకు<input id="wordRoot"></label>
+<label>Meaning / తెల్లం<input id="wordMeaning"></label>
+<label>Word type<input id="wordPos" placeholder="noun / verb / adjective"></label>
+<label>Melimi Telugu word<input id="wordMelimi" placeholder="మేలిమి పలుకు"></label>
+<label>Formation rule<input id="wordFormation" placeholder="optional"></label></div>
+<div class="word-actions"><button id="cancelWord" class="secondary-action" type="button">Cancel</button>
+<button id="registerWord" class="primary-action" type="button">Register Melimi word</button></div>
+<div id="wordResult" class="word-result"></div></div></div></body>
+</html>

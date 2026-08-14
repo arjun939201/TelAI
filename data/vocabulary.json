@@ -1,0 +1,262 @@
+[
+  {
+    "standard": "నమస్కారం",
+    "melimi": "టేంకణములు",
+    "note": "greeting"
+  },
+  {
+    "standard": "సాయం",
+    "melimi": "తోడ్పాటు",
+    "note": "help / assistance"
+  },
+  {
+    "standard": "ప్రభావం",
+    "melimi": "హత్తరం",
+    "note": "effect / impact / influence"
+  },
+  {
+    "standard": "వ్యవస్థ",
+    "melimi": "అమరం",
+    "note": "system"
+  },
+  {
+    "standard": "భావం",
+    "melimi": "మెదలం",
+    "note": "concept / thought"
+  },
+  {
+    "standard": "సాంకేతికత",
+    "melimi": "బిసెర్మి",
+    "note": "technology"
+  },
+  {
+    "standard": "సహజం",
+    "melimi": "తనకం",
+    "note": "natural"
+  },
+  {
+    "standard": "స్పష్టం",
+    "melimi": "తేట",
+    "note": "clear"
+  },
+  {
+    "standard": "సమగ్రం",
+    "melimi": "ఎల్తరం",
+    "note": "comprehensive"
+  },
+  {
+    "standard": "పూర్తి",
+    "melimi": "ఐనిండు",
+    "note": "complete"
+  },
+  {
+    "standard": "బలం",
+    "melimi": "పోతరం / బలిమి",
+    "note": "strength"
+  },
+  {
+    "standard": "ప్రమాదకరం",
+    "melimi": "ముప్పుకాను",
+    "note": "dangerous"
+  },
+  {
+    "standard": "developer",
+    "melimi": "పెంపుకాను",
+    "note": "developer"
+  },
+  {
+    "standard": "కృతజ్ఞుడు",
+    "melimi": "నెనరువాను",
+    "note": "grateful person"
+  },
+  {
+    "standard": "అదృష్టవంతుడు",
+    "melimi": "ప్రాయివాను",
+    "note": "fortunate person"
+  },
+  {
+    "standard": "భౌతికము",
+    "melimi": "మైవాను",
+    "note": "physical"
+  },
+  {
+    "standard": "విజేత",
+    "melimi": "గెలువాను",
+    "note": "winner"
+  },
+  {
+    "standard": "ప్రభావవంతమైన",
+    "melimi": "హత్తరకాను",
+    "note": "effective"
+  },
+  {
+    "standard": "ప్రభావశీలమైన",
+    "melimi": "హత్తరమారి",
+    "note": "influential"
+  },
+  {
+    "standard": "Galaxy",
+    "melimi": "మిన్వాఁక",
+    "note": "galaxy"
+  },
+  {
+    "standard": "Star cluster",
+    "melimi": "మిణుగుత్తి",
+    "note": "star cluster"
+  },
+  {
+    "standard": "Meteor",
+    "melimi": "సిరిక",
+    "note": "meteor"
+  },
+  {
+    "standard": "Comet",
+    "melimi": "తోకజుక్క",
+    "note": "comet"
+  },
+  {
+    "standard": "Asteroid",
+    "melimi": "విన్నరవ",
+    "note": "asteroid"
+  },
+  {
+    "standard": "Milky Way",
+    "melimi": "పాలపుంత / పాలవెల్లి",
+    "note": "milky way"
+  },
+  {
+    "standard": "Solar System",
+    "melimi": "నెసరమరం",
+    "note": "solar system"
+  },
+  {
+    "standard": "Sun",
+    "melimi": "నెసరు",
+    "note": "sun"
+  },
+  {
+    "standard": "Moon",
+    "melimi": "జాబిలి",
+    "note": "moon"
+  },
+  {
+    "standard": "Mercury",
+    "melimi": "నెలాత",
+    "note": "mercury"
+  },
+  {
+    "standard": "Venus",
+    "melimi": "వేగుపలి",
+    "note": "venus"
+  },
+  {
+    "standard": "Mars",
+    "melimi": "కెంబలి",
+    "note": "mars"
+  },
+  {
+    "standard": "Earth",
+    "melimi": "నేలతల్లి / పారిగుండ్రం",
+    "note": "earth"
+  },
+  {
+    "standard": "Jupiter",
+    "melimi": "కాంచువు",
+    "note": "jupiter"
+  },
+  {
+    "standard": "Saturn",
+    "melimi": "గాడ్పలి",
+    "note": "saturn"
+  },
+  {
+    "standard": "Rahu",
+    "melimi": "మాతి",
+    "note": "rahu"
+  },
+  {
+    "standard": "Ketu",
+    "melimi": "సీదరం",
+    "note": "ketu"
+  },
+  {
+    "standard": "best",
+    "melimi": "మేలిమి",
+    "note": "best"
+  },
+  {
+    "standard": "problem",
+    "melimi": "చిక్కు",
+    "note": "problem"
+  },
+  {
+    "standard": "language",
+    "melimi": "నుడి",
+    "note": "language"
+  },
+  {
+    "standard": "grammar",
+    "melimi": "నుడికట్టు",
+    "note": "grammar"
+  },
+  {
+    "standard": "knowledge",
+    "melimi": "తెలిమి",
+    "note": "knowledge"
+  },
+  {
+    "standard": "understanding",
+    "melimi": "ఆకళింపు",
+    "note": "understanding"
+  },
+  {
+    "standard": "friendship",
+    "melimi": "చెలిమి",
+    "note": "friendship"
+  },
+  {
+    "standard": "love",
+    "melimi": "కూర్మి",
+    "note": "love"
+  },
+  {
+    "standard": "happy",
+    "melimi": "మురుపు",
+    "note": "happy"
+  },
+  {
+    "standard": "life",
+    "melimi": "బ్రదుకు",
+    "note": "life"
+  },
+  {
+    "standard": "fire",
+    "melimi": "నిప్పు",
+    "note": "fire"
+  },
+  {
+    "standard": "water",
+    "melimi": "నీరు",
+    "note": "water"
+  },
+  {
+    "standard": "air",
+    "melimi": "గాలి",
+    "note": "air"
+  },
+  {
+    "standard": "sky",
+    "melimi": "నింగి / మిన్ను",
+    "note": "sky"
+  },
+  {
+    "standard": "school",
+    "melimi": "బడి",
+    "note": "school"
+  },
+  {
+    "standard": "book",
+    "melimi": "పొత్తం",
+    "note": "book"
+  }
+]

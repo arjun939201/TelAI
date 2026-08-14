@@ -1,0 +1,247 @@
+[
+  {
+    "standard": "నమస్కారం",
+    "melimi": "టేంకణములు",
+    "note": "greeting"
+  },
+  {
+    "standard": "సహాయం",
+    "melimi": "బాసట",
+    "note": "help"
+  },
+  {
+    "standard": "విషయం",
+    "melimi": "ఎడాటం",
+    "note": "matter/topic"
+  },
+  {
+    "standard": "ఆసక్తికరం",
+    "melimi": "హాళికాను",
+    "note": "interesting"
+  },
+  {
+    "standard": "effect / impact / influence",
+    "melimi": "హత్తరం",
+    "note": "effect"
+  },
+  {
+    "standard": "problem",
+    "melimi": "చిక్కు",
+    "note": "problem"
+  },
+  {
+    "standard": "system",
+    "melimi": "అమరం",
+    "note": "system"
+  },
+  {
+    "standard": "concept / thought",
+    "melimi": "మెదలం",
+    "note": "concept"
+  },
+  {
+    "standard": "technology",
+    "melimi": "బిసెర్మి",
+    "note": "technology"
+  },
+  {
+    "standard": "natural",
+    "melimi": "తనకం",
+    "note": "natural"
+  },
+  {
+    "standard": "clear / clarity",
+    "melimi": "తేట",
+    "note": "clear"
+  },
+  {
+    "standard": "complete",
+    "melimi": "ఐనిండు",
+    "note": "complete"
+  },
+  {
+    "standard": "best",
+    "melimi": "మేలిమి",
+    "note": "best"
+  },
+  {
+    "standard": "dangerous",
+    "melimi": "ముప్పుకాను",
+    "note": "dangerous"
+  },
+  {
+    "standard": "developer",
+    "melimi": "పెంపుకాను",
+    "note": "developer"
+  },
+  {
+    "standard": "grateful",
+    "melimi": "నెనరువాను",
+    "note": "grateful"
+  },
+  {
+    "standard": "Galaxy",
+    "melimi": "మిన్వాఁక",
+    "note": "galaxy"
+  },
+  {
+    "standard": "Sun",
+    "melimi": "నెసరు",
+    "note": "sun"
+  },
+  {
+    "standard": "Moon",
+    "melimi": "జాబిలి",
+    "note": "moon"
+  },
+  {
+    "standard": "Mars",
+    "melimi": "కెంబలి",
+    "note": "mars"
+  },
+  {
+    "standard": "Earth",
+    "melimi": "నేలతల్లి / పారిగుండ్రం",
+    "note": "earth"
+  },
+  {
+    "standard": "Jupiter",
+    "melimi": "కాంచువు",
+    "note": "jupiter"
+  },
+  {
+    "standard": "Saturn",
+    "melimi": "గాడ్పలి",
+    "note": "saturn"
+  },
+  {
+    "standard": "language",
+    "melimi": "నుడి",
+    "note": "language"
+  },
+  {
+    "standard": "grammar",
+    "melimi": "నుడికట్టు",
+    "note": "grammar"
+  },
+  {
+    "standard": "knowledge",
+    "melimi": "తెలిమి",
+    "note": "knowledge"
+  },
+  {
+    "standard": "understanding",
+    "melimi": "ఆకళింపు",
+    "note": "understanding"
+  },
+  {
+    "standard": "analysis",
+    "melimi": "విరలింపు",
+    "note": "analysis"
+  },
+  {
+    "standard": "explanation",
+    "melimi": "విడఁబర్పు",
+    "note": "explanation"
+  },
+  {
+    "standard": "opinion",
+    "melimi": "అనుకోలు",
+    "note": "opinion"
+  },
+  {
+    "standard": "intention",
+    "melimi": "గుఱికోలు",
+    "note": "intention"
+  },
+  {
+    "standard": "attention",
+    "melimi": "ఆలకం",
+    "note": "attention"
+  },
+  {
+    "standard": "question",
+    "melimi": "మల్క",
+    "note": "question"
+  },
+  {
+    "standard": "answer",
+    "melimi": "మార్పలుకు",
+    "note": "answer"
+  },
+  {
+    "standard": "friend",
+    "melimi": "నేస్తం",
+    "note": "friend"
+  },
+  {
+    "standard": "friendship",
+    "melimi": "చెలిమి",
+    "note": "friendship"
+  },
+  {
+    "standard": "love",
+    "melimi": "కూర్మి",
+    "note": "love"
+  },
+  {
+    "standard": "happy",
+    "melimi": "అలరాటం / పొంగు / మురుపు",
+    "note": "happy"
+  },
+  {
+    "standard": "anger",
+    "melimi": "కినుకు / అలక / అలుక",
+    "note": "anger"
+  },
+  {
+    "standard": "fear",
+    "melimi": "వెఱపు / దడుపు",
+    "note": "fear"
+  },
+  {
+    "standard": "life",
+    "melimi": "బ్రదుకు",
+    "note": "life"
+  },
+  {
+    "standard": "death",
+    "melimi": "చావు",
+    "note": "death"
+  },
+  {
+    "standard": "fire",
+    "melimi": "నిప్పు",
+    "note": "fire"
+  },
+  {
+    "standard": "water",
+    "melimi": "నీరు",
+    "note": "water"
+  },
+  {
+    "standard": "air",
+    "melimi": "గాలి",
+    "note": "air"
+  },
+  {
+    "standard": "earth",
+    "melimi": "నేల",
+    "note": "earth"
+  },
+  {
+    "standard": "sky",
+    "melimi": "నింగి / మిన్ను",
+    "note": "sky"
+  },
+  {
+    "standard": "school",
+    "melimi": "బడి",
+    "note": "school"
+  },
+  {
+    "standard": "book",
+    "melimi": "పొత్తం",
+    "note": "book"
+  }
+]

@@ -1,19 +1,19 @@
 services:
   - type: web
-    name: telai
-    env: python
-
+    name: teluai
+    runtime: python
     buildCommand: pip install -r requirements.txt
-
-    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
-
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
-
-      - key: GROQ_URL
-        value: https://api.groq.com/openai/v1/chat/completions
-
-      - key: GROQ_MODEL
-        value: llama-3.3-70b-versatile
-
       - key: GROQ_TOKEN
         sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      # Groq's free tier for llama-3.3-70b-versatile is roughly 30 RPM /
+      # 6,000-12,000 TPM. The app now sends a much smaller prompt per turn
+      # by default, but if you still hit 429s frequently, either:
+      #  1) switch GROQ_MODEL to llama-3.1-8b-instant (far higher free-tier
+      #     request/day budget), or
+      #  2) tune these (all optional, sensible defaults already applied):
+      #     MAX_HISTORY_TURNS, MAX_HISTORY_CHARS_PER_TURN,
+      #     MELIMI_PROFILE_CHARS, MELIMI_RELEVANT_CHARS, MAX_RESPONSE_TOKENS
